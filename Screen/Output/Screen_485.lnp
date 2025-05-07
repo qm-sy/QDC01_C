@@ -1,0 +1,12 @@
+"..\Output\STARTUP.obj",
+"..\Output\delay.obj",
+"..\Output\gpio.obj",
+"..\Output\main.obj",
+"..\Output\tim.obj",
+"..\Output\uart.obj",
+"..\Output\communication.obj",
+"..\Output\tm1722.obj",
+"..\Output\key.obj",
+"..\Output\modbus_rtu.obj" 
+TO "..\Output\Screen_485" 
+PRINT(".\Listings\Screen_485.m51") RAMSIZE(256) 

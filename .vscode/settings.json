@@ -1,0 +1,8 @@
+{
+    "files.exclude": {
+        "**/.vscode": true
+    },
+    "files.associations": {
+        "power_crl.h": "c"
+    }
+}

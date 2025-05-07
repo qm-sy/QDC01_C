@@ -1,0 +1,66 @@
+#ifndef __TM1722_H_
+#define __TM1722_H_
+
+#include "sys.h"
+#include "gpio.h"
+#include "delay.h"
+
+#define COM1_L 0X01
+#define COM2_L 0X02
+#define COM3_L 0X04
+#define COM4_L 0X08
+#define COM1_H 0X10
+#define COM2_H 0X20
+#define COM3_H 0X40
+#define COM4_H 0X80
+
+#define ADDR_03 0
+#define ADDR_06 1
+#define ADDR_07 2
+#define ADDR_0A 3
+#define ADDR_0B 4
+#define ADDR_0E 5
+#define ADDR_0F 6
+
+#define DIS_ON  1
+#define DIS_OFF 0
+
+#define LED_OPEN  1
+#define LED_SLEEP 2
+#define LED_ON    0
+#define LED_OFF   1
+
+extern uint8_t value_03;  //该地址的值
+extern uint8_t value_06;
+extern uint8_t value_07;
+extern uint8_t value_0A;
+extern uint8_t value_0B;
+extern uint8_t value_0E;
+extern uint8_t value_0F;
+
+extern uint8_t addr_tab[7];
+extern uint8_t num_tab[10];
+
+void screen_init( void );
+void screen_clear( void );
+void screen_display( void );
+void screen_write_val(uint8_t addr,uint8_t dat);
+void TM1722_Write_Byte(uint8_t dat);
+
+void num_dis(uint8_t num);
+void wind_dis(uint8_t num);
+void num_dis(uint8_t num);
+void channel_dis(uint8_t num);
+void sun_dis(bit on_off);
+void sync_dis(bit on_off);
+void alarm_dis(bit on_off);
+void Celsius_dis(bit on_off);
+void mode_dis(bit on_off);
+void percentage_dis(bit on_off);
+void fan_center_dis(bit on_off);
+void fan_leaf1_dis(bit on_off);
+void fan_leaf2_dis(bit on_off);
+
+void led_status( uint8_t status); 
+
+#endif
