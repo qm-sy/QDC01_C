@@ -1,3 +1,0 @@
-".\Objects\STARTUP.obj" 
-TO ".\Objects\Screen_485" 
-PRINT(".\Listings\Screen_485.m51") RAMSIZE(256) 

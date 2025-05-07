@@ -5,11 +5,9 @@
 #include "stdio.h"
 #include "gpio.h"
 
-
 #define S4TI    0X02
 #define S4RI    0X01
-extern uint8_t cnt1 ;
-extern uint8_t cnt2 ;
+
 typedef struct 
 {
     uint8_t     RX4_rev_end_Flag;       //数据包接收完毕标志

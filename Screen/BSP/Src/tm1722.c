@@ -322,3 +322,19 @@ void fan_leaf2_dis(bit on_off)
     }
     screen_write_val(addr_tab[ADDR_0F],value_0F);
 }
+
+void screen_all_dis( void )
+{
+    num_dis(100);
+    wind_dis(5);
+    channel_dis(3);
+    sun_dis(DIS_ON);
+    sync_dis(DIS_ON);
+    alarm_dis(DIS_ON);
+    Celsius_dis(DIS_ON);
+    mode_dis(DIS_ON);
+    percentage_dis(DIS_ON);
+    fan_center_dis(DIS_ON);
+    fan_leaf1_dis(DIS_ON);
+    fan_leaf2_dis(DIS_ON);
+}

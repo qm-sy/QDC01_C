@@ -11,7 +11,7 @@
 #ifndef _GPIO_H_
 #define _GPIO_H_
 
-#include "sys.h"
+#include "stc.h" 
 
 sbit DATA   = P0^1;
 sbit CS     = P0^2;

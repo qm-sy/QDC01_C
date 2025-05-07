@@ -1,7 +1,7 @@
 #ifndef __TM1722_H_
 #define __TM1722_H_
 
-#include "sys.h"
+#include "stc.h" 
 #include "gpio.h"
 #include "delay.h"
 
@@ -61,6 +61,7 @@ void fan_center_dis(bit on_off);
 void fan_leaf1_dis(bit on_off);
 void fan_leaf2_dis(bit on_off);
 
+void screen_all_dis( void );
 void led_status( uint8_t status); 
 
 #endif
