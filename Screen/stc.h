@@ -24,8 +24,4 @@ typedef unsigned char uint8_t;
 typedef unsigned int uint16_t;
 typedef unsigned long uint32_t;
 
-sbit LED_R = P3^3;
-sbit LED_G = P3^4;
-sbit LED_B = P4^0;
-
 #endif

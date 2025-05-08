@@ -1,0 +1,12 @@
+{
+    "files.exclude": {
+        "**/.vscode": true
+    },
+    "files.associations": {
+        "uart.h": "c",
+        "delay.h": "c",
+        "touch.h": "c",
+        "stc.h": "c",
+        "tm1722.h": "c"
+    }
+}

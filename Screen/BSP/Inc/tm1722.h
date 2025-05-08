@@ -40,8 +40,18 @@ extern uint8_t value_0F;
 
 extern uint8_t addr_tab[7];
 extern uint8_t num_tab[10];
+extern bit sync_flag;
+
+typedef struct 
+{
+    uint8_t  power_level;       
+    uint8_t  fan_level;  
+}LCD_INFO;
+
+extern LCD_INFO lcd_info;
 
 void screen_init( void );
+void lcd_info_init( void );
 void screen_clear( void );
 void screen_display( void );
 void screen_write_val(uint8_t addr,uint8_t dat);

@@ -1,23 +1,20 @@
 #include "touch.h"
 
 //P54 P13 14 15 TK2 3 4 5
-u16	xdata TK_cnt[16];	// 键计数值
-u32	xdata TK_zero[16];	// 0点读数 
-u16 T_KeyCmp[16] ;
+u16	xdata TK_cnt[6];	// 键计数值
+u32	xdata TK_zero[6];	// 0点读数 
+u16 T_KeyCmp[6] ;
 bit	B_ReadKeyOk=1;	//标志已转换完成16个键
-u16 Count[16] ;
+u16 Count[6] ;
 u16 LastState ;						//8位变量 	b0=1，代表k0上一次按下过 
-
+KEY_VAL key_val;
 	
 void KEY_T_Init(void)
 {
     u8 i,j=0;
 
-	P1n_pure_input(0x38);	//Touch Key设置为高阻
-	P5n_pure_input(0x10);
-
 	TSRT = 0x00;		//没有LED分时扫描
-	TSCHEN1 = 0x3c;	//TK00~TK07
+	TSCHEN1 = 0x3f;	//TK00~TK07
 	TSCHEN2 = 0x00;	//TK08~TK15
 	
 	TSCFG1  = (7<<4) + 3;	//开关电容工作频率 = fosc/(2*(TSCFG1[6:4]+1)), 放电时间(系统时钟周期数) 0(125) 1(250) 2(500) 3(1000) 4(2000) 5(2500) 6(5000) 7(7500) 最小3
@@ -34,24 +31,28 @@ void KEY_T_Init(void)
 	TSCTRL = 0xA0;
 	
 	delay_ms(100);
-    for(i=0;i<16;i++)
-        TK_zero[i]=0;	
-    while(j<8)
+    for(i=0;i<6;i++)
+	{
+		TK_zero[i]=0;
+	}
+        	
+    while(j<6)
     {
         if( B_ReadKeyOk )
         {
-            for(i=0;i<16;i++)
+            for(i=0;i<6;i++)
                 TK_zero[i] += TK_cnt[i];
             B_ReadKeyOk = 0;
             j++;
         }
         delay_ms(50);
     }
-    for(i=0;i<16;i++)
+    for(i=0;i<6;i++)
     {
         TK_zero[i]=(TK_zero[i]>>3);
 //        printf("%u\t",(u16)TK_zero[i]);
         T_KeyCmp[i] = 1500;
+		//T_KeyCmp[i] = TK_zero[i] * 0.3;
     }    
     
 }
@@ -74,25 +75,46 @@ void KEY_Deal(void)			//检查所有的按键状态 10ms执行一次
     
 //    printf("(%u,%u,%u)\r\n",(u16)TK_cnt[0],(u16)TK_cnt[1],(u16)TK_cnt[2]);
     
-	for(i=0;i<16;i++)					//循环8次 i的取值范围是0-7  代表了P30-P37的状态查询
+	for(i=0;i<6;i++)					//循环8次 i的取值范围是0-7  代表了P30-P37的状态查询
 	{
-		if( TK_cnt[i]< (TK_zero[i]-T_KeyCmp[i]))			//持续按下，变量+1  
-//		if( TK_cnt[i]> (TK_zero[i]+T_KeyCmp[i]))			//持续按下，变量+1			
+		if( i < 3 )
 		{
-			if( Count[i]<60000 )
-				Count[i] ++;			//按键按下，这个计数变量+1
-		}
-		else							//按键松开了，变量清0
+			if( TK_cnt[i]< (TK_zero[i]-T_KeyCmp[i]))			//持续按下，变量+1 
+			{
+				if( Count[i]<60000 )
+					Count[i] ++;			//按键按下，这个计数变量+1
+			}
+			else							//按键松开了，变量清0
+			{
+				if( Count[i]>0 )			//如果这个变量是按下过的
+				{
+					LastState |= (1<<i);	//这个变量相应的标志位置位
+				}
+				else
+				{
+					LastState &= ~(1<<i);	//这个变量相应的标志位清0
+				}
+				Count[i] = 0;				//按键按下，这个计数变量清0
+			}
+		}else
 		{
-			if( Count[i]>0 )			//如果这个变量是按下过的
+			if( TK_cnt[i]> (TK_zero[i]+T_KeyCmp[i]))			//持续按下，变量+1			
 			{
-				LastState |= (1<<i);	//这个变量相应的标志位置位
+				if( Count[i]<60000 )
+					Count[i] ++;			//按键按下，这个计数变量+1
 			}
-			else
+			else							//按键松开了，变量清0
 			{
-				LastState &= ~(1<<i);	//这个变量相应的标志位清0
+				if( Count[i]>0 )			//如果这个变量是按下过的
+				{
+					LastState |= (1<<i);	//这个变量相应的标志位置位
+				}
+				else
+				{
+					LastState &= ~(1<<i);	//这个变量相应的标志位清0
+				}
+				Count[i] = 0;				//按键按下，这个计数变量清0
 			}
-			Count[i] = 0;				//按键按下，这个计数变量清0
 		}
 	}
 }
@@ -155,3 +177,112 @@ u8 KEY_ReadState(u8 keynum)	//读取指定的按键的状态 10ms执行一次
 	}
 }
 
+void key_scan( void )
+{
+	if( key_val.key_sacn_flag == 1 )
+	{
+		KEY_Deal();	
+		if( KEY_ReadState(KEY4) == KEY_PRESS )											//调节通道
+		{
+			channel_choose();
+		}
+		if(( KEY_ReadState(KEY2) == KEY_PRESS ) && ( key_val.key2_scan_allow == 1 ))	//调节功率↑
+		{
+			up_key();
+		}
+		if(( KEY_ReadState(KEY3) == KEY_PRESS ) && ( key_val.key3_scan_allow == 1 ))	//调节功率↓
+		{
+			down_key();
+		}
+		if(( KEY_ReadState(KEY5) == KEY_PRESS ) && ( key_val.key5_scan_allow == 1 ))
+		{
+			sync_flag = ~sync_flag;
+			sun_dis(sync_flag);
+		}
+
+		if( KEY_ReadState(KEY6) == KEY_LONGOVER )										//调节风力
+		{
+			key_val.key2_scan_allow = 0;
+			key_val.key3_scan_allow = 0;
+			key_val.key5_scan_allow = 0;
+
+			if( KEY_ReadState(KEY2) == KEY_PRESS )
+			{
+				fan_up();
+			}
+			if( KEY_ReadState(KEY3) == KEY_PRESS )
+			{
+				fan_down();
+			}
+			if( KEY_ReadState(KEY5) == KEY_PRESS )
+			{
+				sync_flag = ~sync_flag;
+				sync_dis(sync_flag);
+			}
+		}
+		if( KEY_ReadState(KEY6) == KEY_NOPRESS )//释放按键2、3
+		{
+			key_val.key2_scan_allow = 1;
+			key_val.key3_scan_allow = 1;
+			key_val.key5_scan_allow = 1;
+		}
+
+	}
+	
+}
+
+
+void channel_choose( void )
+{
+	static uint8_t channel_num = 0;
+    if(channel_num==7)
+    {
+        channel_num = 1;
+    }
+    else
+    {
+        channel_num += 1;
+    }
+    channel_dis(channel_num);
+}
+
+void up_key( void )
+{
+    if( lcd_info.power_level < 100 )
+    {
+        lcd_info.power_level += 5;
+    }
+
+    num_dis(lcd_info.power_level);
+}
+
+void down_key( void )
+{
+
+    if( lcd_info.power_level > 0)
+    {
+        lcd_info.power_level -= 5;
+    }
+
+    num_dis(lcd_info.power_level);
+}
+
+void fan_up( void )
+{
+    if( lcd_info.fan_level < 6 )
+    {
+        lcd_info.fan_level++;
+    }
+
+    wind_dis(lcd_info.fan_level);
+}
+
+void fan_down( void )
+{
+    if( lcd_info.fan_level > 0 )
+    {
+        lcd_info.fan_level--;
+    }
+
+    wind_dis(lcd_info.fan_level);
+}

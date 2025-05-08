@@ -1,5 +1,7 @@
 #include "tm1722.h"
 
+LCD_INFO lcd_info;
+
 uint8_t value_03 = 0;  //该地址的值
 uint8_t value_06 = 0;
 uint8_t value_07 = 0;
@@ -7,11 +9,14 @@ uint8_t value_0A = 0;
 uint8_t value_0B = 0;
 uint8_t value_0E = 0;
 uint8_t value_0F = 0; 
- 
+
 uint8_t addr_tab[7] = { 0xc3,0xc6,0xc7,0xca,0xcb,0xce,0xcf};
 
 uint8_t num_tab[10] = {0xF5,0x05,0xD3,0x97,0x27,0xB6,0xF6,0x15,0xF7,0xB7};
                      /*  0    1    2    3    4    5    6    7    8    9  */
+
+bit  sync_flag = 0;  
+
 void screen_init( void )
 {
     WR = 1;            //端口配置初始化
@@ -25,6 +30,12 @@ void screen_init( void )
     screen_clear();
     
     screen_display();
+}
+ 
+void lcd_info_init( void )
+{
+    lcd_info.power_level = 50;
+    lcd_info.fan_level = 3;
 }
 
 void led_status( uint8_t status ) 
@@ -325,11 +336,11 @@ void fan_leaf2_dis(bit on_off)
 
 void screen_all_dis( void )
 {
-    num_dis(100);
-    wind_dis(5);
+    num_dis(lcd_info.power_level);
+    wind_dis(lcd_info.fan_level);
     channel_dis(3);
     sun_dis(DIS_ON);
-    sync_dis(DIS_ON);
+    sync_dis(sync_flag);
     alarm_dis(DIS_ON);
     Celsius_dis(DIS_ON);
     mode_dis(DIS_ON);

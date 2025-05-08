@@ -12,81 +12,35 @@ u8	isr_index;
 void main(void)
 {
 	u8 i=0;
-	
+	//uint16_t cnt = 0;
     P_SW2 |= 0x80;     //扩展寄存器(XFR)访问使能
-    LED_R = 0;LED_G = 0; LED_B =0; 
-	P0M1 = 0x00;   P0M0 = 0x07;   //设置为准双向口
-	P1M1 = 0x00;   P1M0 = 0x30;   //设置为准双向口
-	P2M1 = 0x00;   P2M0 = 0x10;   //设置为准双向口
-	P3M0 = 0X82;    P3M1 = 0X00; 
-	P4M1 = 0x00;   P4M0 = 0x01;   //设置为准双向口
-	P5M1 = 0x00;   P5M0 = 0x00;   //设置为准双向口
-	P6M1 = 0x00;   P6M0 = 0x00;   //设置为准双向口
-	P7M1 = 0x00;   P7M0 = 0x00;   //设置为准双向口
+    GPIO_Init();
 
 	/*  调试使用 printf  */
 	Uart1_Init();
 
     EA = 1;     //打开总中断
 
-
-
 	BL = 0;
 	screen_init();
+	lcd_info_init();
 	screen_all_dis();
 	KEY_T_Init(); 	
 	//LoadToLcd();	
-	
+	key_val.key1_scan_allow = 1;       
+    key_val.key2_scan_allow = 1;  
+    key_val.key3_scan_allow = 1;   
+    key_val.key4_scan_allow = 1;   
+    key_val.key5_scan_allow = 1;   
+    key_val.key6_scan_allow = 1; 
+	key_val.key_sacn_flag   = 1;
 	printf("====== code start ====== \r\n");
 
     while(1)
     {
-		KEY_Deal();	
-//		
-		if( KEY_ReadState(1)==KEY_PRESS )
-		{
-			P24 = 0;
-			printf("111 \r\n");
-		}		
-			
-		
-		if( KEY_ReadState(2)==KEY_PRESS )		//模式设置按钮
-		{
-			P24 = 0;
-			printf("222 \r\n");
-		}		
-			
-		if( KEY_ReadState(3)==KEY_PRESS )		//模式设置按钮
-		{
-			P24 = 0;
-			printf("333 \r\n");
-		}		
-			
-        if( KEY_ReadState(4)==KEY_PRESS )		//模式设置按钮
-		{
-			P24 = 0;
-			printf("444 \r\n");
-		}		
-			
-		if( KEY_ReadState(5)==KEY_PRESS )		//模式设置按钮
-		{
-			P24 = 0;
-			printf("555 \r\n");
-		}		
-			
-		if( KEY_ReadState(6)==KEY_PRESS )		//模式设置按钮
-		{
-			P24 = 0;
-			printf("666 \r\n");
-		}		
-			
-		if( KEY_ReadState(7)==KEY_PRESS )		//模式设置按钮
-		{
-			P24 = 0;
-			printf("777 \r\n");
-		}		
-					
-
+		i = KEY_ReadState(KEY6);
+		printf("The value is %d \r\n",(int)i);
+		key_scan();
 		delay_ms(10);
 	
 	}
