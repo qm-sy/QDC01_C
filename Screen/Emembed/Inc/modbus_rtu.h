@@ -4,6 +4,7 @@
 #include "stc.h" 
 #include "communication.h"
 #include "delay.h"
+#include "tm1722.h"
 
 #define MY_ADDR     0xDC
 
@@ -29,5 +30,7 @@ void Modbus_Fun16( void );
 
 void slave_to_master(uint8_t code_num,uint8_t length);
 uint16_t MODBUS_CRC16(uint8_t *buf, uint8_t length);
+void send_to_slave( void );
+void get_slave_statu_03( void );
 
 #endif

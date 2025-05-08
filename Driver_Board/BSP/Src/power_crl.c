@@ -50,19 +50,8 @@ void Tim1_ISR( void ) interrupt 3   //10ms
         ac_dc.zero_flag = 0;
 
          /* 2, 温度允许，使能为1时可开启输出          */
-        if(( ac_dc.ac220_out1_enable == 1 ) && (ac_dc.ac220_out_temp_allow == 1))
-        {
-            AC_Out1 = 0;
-        }
-        if(( ac_dc.ac220_out2_enable == 1 ) && (ac_dc.ac220_out_temp_allow == 1))
-        {
-            AC_Out2 = 0;
-        }
-        if(( ac_dc.ac220_out3_enable == 1 ) && (ac_dc.ac220_out_temp_allow == 1))
-        {
-            AC_Out3 = 0;
-        }
-
+        AC_Out1 = AC_Out2 = AC_Out3 = 0;
+        
          /* 3, 设置下一次Timer1中断触发所需时间，即脉冲时间       */
         TL1 = 0xF7;				
         TH1 = 0xFF;				
@@ -89,23 +78,6 @@ void ac_220v_crl( uint8_t power_level )
     ac_dc.time_delay = 56500 + 90*power_level;
 }
 
-/**
- * @brief	24V LED开关控制函数
- *
- * @param   on_off：0：关闭 1：开启
- *
- * @return  void
-**/
-void led_ctrl( uint8_t on_off )
-{
-    if( on_off == FAN_ON )
-    {
-        LED = 0;
-    }else
-    {
-        LED = 1;
-    }
-}
 
 /**
  * @brief	24V PWM风扇档位控制函数
@@ -116,7 +88,8 @@ void led_ctrl( uint8_t on_off )
 **/
 void fan_ctrl( uint8_t level )
 {
-    PWMB_CCR7= level * 184;
+    PWMB_CCR7 = level * 184;
+    PWMB_CCR8 = level * 184;
 }
 
 /**
@@ -160,62 +133,15 @@ void temp_scan( void )
     {
         temp.temp_value1 =  get_temp(NTC);
 
-        Read_DHT11();
-
-        if( temp.temp_value1 >= temp.temp_alarm_value )  
+        if( temp.temp_value1 >= ac_dc.alarm_temp_val )
         {
-            ac_dc.ac220_out_temp_allow = 0;     
+            FAN_TMEP = 1;
         }else
         {
-            ac_dc.ac220_out_temp_allow = 1;     
+            FAN_TMEP = 0;
         }
-
+        
         temp.temp_scan_flag = 0;
     }
 }
 
-/**
- * @brief	模式控制函数 
- *
- * @param   
- *
- * @return  void
-**/
-void mode_ctrl( uint8_t mode_num )
-{
-    switch (mode_num)
-    {
-        case 1:
-            ac_220v_crl(30);
-            fan_ctrl(3);
-
-            eeprom.ac220_level = 30;
-            eeprom.pwm_info = 3;
-            eeprom_data_record();
-
-            break;
-
-        case 2:
-            ac_220v_crl(50);
-            fan_ctrl(4);
-
-            eeprom.ac220_level = 50;
-            eeprom.pwm_info = 4;
-            eeprom_data_record();
-
-            break;
-
-        case 3:
-            ac_220v_crl(80);
-            fan_ctrl(6);
-
-            eeprom.ac220_level = 80;
-            eeprom.pwm_info = 6;
-            eeprom_data_record();
-
-            break;
-
-        default:
-            break;
-    }
-}

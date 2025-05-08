@@ -7,6 +7,10 @@
         "delay.h": "c",
         "touch.h": "c",
         "stc.h": "c",
-        "tm1722.h": "c"
+        "tm1722.h": "c",
+        "gpio.h": "c",
+        "modbus_rtu.h": "c",
+        "common.h": "c",
+        "communication.h": "c"
     }
 }

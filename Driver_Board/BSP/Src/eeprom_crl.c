@@ -1,6 +1,6 @@
 #include "eeprom_crl.h"
 
-EEPROM_INFO eeprom;
+uint8_t mode_info[5];
 
 /**
  * @brief	eeprom状态判定，是否写入过
@@ -12,25 +12,48 @@ EEPROM_INFO eeprom;
 void eeprom_statu_judge( void )
 {
     uint8_t eeprom_statu_flag;
+    uint8_t i,j;
+    uint8_t addr;
 
     eeprom_statu_flag = ISP_Read(EEPROM_STATU_JUDGE);
 
     if( eeprom_statu_flag == 0xFF)
     {
-        eeprom.pwm_info          = 0x03;          // 0000 0011  pwm默认开，3档风速
-        eeprom.led_info          = 0x01;          // 0000 0001  led默认开
-        eeprom.ac220_switch      = 0x07;          // 0000 0111  220V输出默认三路使能
-        eeprom.ac220_level       = 0x32;          // 50         220V输出50%功率
-        eeprom.sync_info         = 0x00;          // 0000 0000  同步模式默认关闭
-        eeprom.mode_info         = 0x02;          // 0000 0010  工作模式默认普通
-        eeprom.temp_alarm_value  = 0x50;          // NTC1 alarm value 默认80℃
-        eeprom.gonglv_min        = 0x00;
-        eeprom.gonglv_h_H        = 0x00;
-        eeprom.gonglv_h_L        = 0x00;
+        ac_dc.channel_num       = 0x07;          // 0000 0111  三路全开
+        ac_dc.sync_flag         = 0x00;          // 0000 0001  sync默认关
+        ac_dc.fan_level         = 0x03;          // 3  风扇默认三档
+        ac_dc.power_level       = 0x32;          // 50         220V输出50%功率
+        ac_dc.alarm_temp_val    = 0x50;          // 报警温度默认80℃
 
-        eeprom_data_record(); 
+        mode_info[0] = ac_dc.channel_num;
+        mode_info[1] = ac_dc.sync_flag;
+        mode_info[2] = ac_dc.fan_level;
+        mode_info[3] = ac_dc.power_level;
+        mode_info[4] = ac_dc.alarm_temp_val;
+
+        for( j = 0; j < 5; j++)
+        {
+            addr = ((j + 1) * 2) << 8;
+            for( i = 0; i < 5; i++)
+            {
+                ISP_Earse(addr);
+                ISP_Write(addr,mode_info[i]);
+                addr++;
+            }
+        }
+        ac_dc.mode_num = 1;
+        eeprom_mode_record();
+    }else
+    {
+        eeprom_data_init(); 
     }
-    eeprom_data_init();    
+}
+
+void eeprom_mode_record( void )
+{
+    ISP_Earse(MODE_ADDR);
+    ISP_Write(MODE_ADDR,ac_dc.mode_num);
+    ISP_Write(EEPROM_STATU_JUDGE,0x58);
 }
 
 /**
@@ -42,20 +65,23 @@ void eeprom_statu_judge( void )
 **/
 void eeprom_data_record( void )
 {
-    ISP_Earse(0x0000);
+    uint8_t i;
+    uint16_t addr;
 
-    ISP_Write(PWM_ADDR,eeprom.pwm_info);
-    ISP_Write(LED_ADDR,eeprom.led_info);
-    ISP_Write(AC220_ADDR1,eeprom.ac220_switch);
-    ISP_Write(AC220_ADDR2,eeprom.ac220_level);
-    ISP_Write(SYNC_ADDR,eeprom.sync_info);
-    ISP_Write(MODE_ADDR,eeprom.mode_info);
-    ISP_Write(TEMP_ALARM,eeprom.temp_alarm_value);
-    ISP_Write(GONGLV_MIN,eeprom.gonglv_min);
-    ISP_Write(GONGLV_H_H,eeprom.gonglv_h_H);
-    ISP_Write(GONGLV_H_L,eeprom.gonglv_h_L);
+    mode_info[0] = ac_dc.channel_num;
+    mode_info[1] = ac_dc.sync_flag;
+    mode_info[2] = ac_dc.fan_level;
+    mode_info[3] = ac_dc.power_level;
+    mode_info[4] = ac_dc.alarm_temp_val;
 
-    ISP_Write(EEPROM_STATU_JUDGE,0x58);
+    addr = (ac_dc.mode_num * 2) << 8;
+    ISP_Earse(addr);
+
+    for( i = 0; i < 5; i++)
+    {
+        ISP_Write(addr,mode_info[i]);
+        addr++;
+    }
 }
 
 /**
@@ -67,46 +93,20 @@ void eeprom_data_record( void )
 **/
 void eeprom_data_init( void )
 {
-    /*    PWM风速初始化    */
-    eeprom.pwm_info = ISP_Read(PWM_ADDR);
+    uint8_t i;
+    uint16_t addr;
 
-    PWMB_CCR7 = eeprom.pwm_info * 184;
+    ac_dc.mode_num = ISP_Read(MODE_ADDR);
 
-    /*    LED开关状态初始化    */
-    eeprom.led_info = ISP_Read(LED_ADDR);
-
-    led_ctrl(eeprom.led_info );
-
-    /*    三路220V输出使能初始化    */
-    eeprom.ac220_switch = ISP_Read(AC220_ADDR1);
-
-    ac_dc.ac220_out1_enable = ((eeprom.ac220_switch) & 0x01);
-    ac_dc.ac220_out2_enable = ((eeprom.ac220_switch >> 1) & 0x01);
-    ac_dc.ac220_out3_enable = ((eeprom.ac220_switch >> 2) & 0x01);
-
-    /*    三路220V输出功率初始化    */
-    eeprom.ac220_level = ISP_Read(AC220_ADDR2);
-
-    ac_220v_crl(eeprom.ac220_level);
-
-    /*    同步状态初始化    */
-    eeprom.sync_info = ISP_Read(SYNC_ADDR);
-    
-    ac_dc.sync_flag = eeprom.sync_info;
-    sync_ctrl();
-
-    /*    工作模式初始化    */
-    eeprom.mode_info = ISP_Read(MODE_ADDR);
-    
-    ac_dc.mode_info  = eeprom.mode_info;
-    mode_ctrl(ac_dc.mode_info);
-
-    /*    报警温度初始化    */
-    eeprom.temp_alarm_value = ISP_Read(TEMP_ALARM);
-
-    temp.temp_alarm_value = eeprom.temp_alarm_value;
-
-    /*    报警温度初始化    */
-    gonglv.gonglv_min = eeprom.gonglv_min;
-    gonglv.gonglv_h = ((eeprom.gonglv_h_H << 8) | (eeprom.gonglv_h_L));
+    addr = (ac_dc.mode_num * 2) << 8;
+    for( i = 0; i < 5; i++)
+    {
+        ISP_Write(addr,mode_info[i]);
+        addr++;
+    }
+    ac_dc.channel_num = mode_info[0];
+    ac_dc.sync_flag   = mode_info[1];
+    ac_dc.fan_level   = mode_info[2];
+    ac_dc.power_level = mode_info[3];
+    ac_dc.alarm_temp_val    = mode_info[4];
 }

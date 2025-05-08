@@ -83,46 +83,48 @@ void Modbus_Fun3( void )
         modbus.byte_info_H = modbus.byte_info_L = 0X00;
         switch (i)
         {   
-            /*  40001 风速查询                     */
+            /*  40001 通道查询                     */
             case 0x00:
-                modbus.byte_info_L = PWMB_CCR7 / 184;
-                modbus.byte_info_H = 0x00;
+
+                modbus.byte_info_H = 0;
+                modbus.byte_info_L = ac_dc.channel_num;
 
                 break;
 
-            /*  40002 LED开关状态查询                     */    
+            /*  40002 同步状态查询                     */    
             case 0x01:
-                modbus.byte_info_L = ~LED;
-                modbus.byte_info_H = 0X00;
-                break;
-
-            /*  40003 3路220V开关使能查询                         */
-            case 0x02:    
-                modbus.byte_info_L = (ac_dc.ac220_out1_enable) | (ac_dc.ac220_out2_enable << 1) | (ac_dc.ac220_out3_enable << 2);
-                modbus.byte_info_H = (ac_dc.time_delay - 58000)/75;
-
-                break;
-
-            /*  40004 同步状态查询              */
-            case 0x03:    
+                modbus.byte_info_H = 0;
                 modbus.byte_info_L = ac_dc.sync_flag;
-                modbus.byte_info_H = 0X00;  
+                break;
+
+            /*  40003 风速查询                         */
+            case 0x02:    
+                modbus.byte_info_H = 0;
+                modbus.byte_info_L = ac_dc.fan_level;
+
+                break;
+
+            /*  40004 功率查询              */
+            case 0x03:    
+                modbus.byte_info_H = 0;
+                modbus.byte_info_L = ac_dc.power_level;
 
                 break;
 
             /*  40005 工作模式查询                     */
             case 0x04:   
-                modbus.byte_info_L = ac_dc.mode_info;
-                modbus.byte_info_H = 0X00;                    
+                modbus.byte_info_H = 0;
+                modbus.byte_info_L = ac_dc.alarm_temp_val;
 
                 break;
 
             /*  40006 报警温度查询                     */
             case 5:   
-                modbus.byte_info_L = temp.temp_alarm_value;
-                modbus.byte_info_H = 0X00;                    
+                modbus.byte_info_H = 0;
+                modbus.byte_info_L = ac_dc.mode_num;
 
                 break;
+
             default:
                 break;
         }
@@ -157,48 +159,6 @@ void Modbus_Fun4( void )
         modbus.byte_info_H = modbus.byte_info_L = 0X00;
         switch (i)
         {
-            /*  30001  NTC1、NTC2温度查询                           */
-            case 0x00:
-                modbus.byte_info_L = get_temp(NTC);
-                modbus.byte_info_H = 0x00;   
-
-                break;
-
-            /*  30002  NTC3、NTC4温度查询                */
-            case 0x01:
-                modbus.byte_info_H = 0x00;    
-                modbus.byte_info_L = 0x00;
-
-                break;
-
-            /*  30003 环境温湿度查询                   */
-            case 0x02:
-                modbus.byte_info_H = temp.dht11_humidity;           
-                modbus.byte_info_L = temp.dht11_temp;          
-
-                break;
-
-            /*  30004 Signal_IN状态查询                   */
-            case 0x03:
-                modbus.byte_info_H = 0x00;           
-                modbus.byte_info_L = ac_dc.signal_in_flag;          
-
-                break;
-                
-            /*  30005 运行时间（min）                   */
-            case 0x04:
-                modbus.byte_info_H = 0x00;           
-                modbus.byte_info_L = gonglv.gonglv_min;          
-
-                break;
-
-            /*  30006 运行时间（h）                   */
-            case 0x05:
-                modbus.byte_info_H = gonglv.gonglv_h >> 8;           
-                modbus.byte_info_L = gonglv.gonglv_h;          
-
-                break;
-
             default:
                 break;
         }
@@ -221,55 +181,37 @@ void Modbus_Fun6( void )
     {
         /*  40001  风速设置                 */
         case 0x00:                  
-            fan_ctrl(rs485.RX4_buf[5]);
-
-            eeprom.pwm_info = rs485.RX4_buf[5];
+            
 
             break;
 
         /*  40002  LED 开关状态设置                          */
         case 0x01:                                         
 
-            led_ctrl(rs485.RX4_buf[5]);
 
-            eeprom.led_info = rs485.RX4_buf[5];
 
             break;
 
         /*  40003 三路220V输出使能设置                          */
         case 0x02:                                         
-            ac_dc.ac220_out1_enable = (rs485.RX4_buf[5]    & 0x01);
-            ac_dc.ac220_out2_enable = (rs485.RX4_buf[5]>>1 & 0x01);
-            ac_dc.ac220_out3_enable = (rs485.RX4_buf[5]>>2 & 0x01);
-            ac_220v_crl(rs485.RX4_buf[4]);
-            
-            eeprom.ac220_switch = rs485.RX4_buf[5];
-            eeprom.ac220_level  = rs485.RX4_buf[4];
+
             break;  
             
         /*  40004  同步状态设置                   */
         case 0x03:                                         
-            ac_dc.sync_flag = rs485.RX4_buf[5];
-            sync_ctrl();
 
-            eeprom.sync_info = rs485.RX4_buf[5];
 
             break;
 
         /*  40005  工作模式设置                   */
         case 0x04:                                         
-            ac_dc.mode_info = rs485.RX4_buf[5];
-            mode_ctrl(ac_dc.mode_info);
 
-            eeprom.mode_info = rs485.RX4_buf[5];
 
             break;
 
         /*  40006  报警温度设置                   */
         case 0x05:                                         
-            temp.temp_alarm_value = rs485.RX4_buf[5];
 
-            eeprom.temp_alarm_value = rs485.RX4_buf[5];
             
             break;
 
@@ -304,61 +246,44 @@ void Modbus_Fun16( void )
         modbus.byte_info_L = rs485.RX4_buf[modbus.rcv_value_addr + 1];
         switch (i)
         {
-            /*  40001  风速设置                 */
+            /*  40001  通道设置                 */
             case 0x00:
-                fan_ctrl(modbus.byte_info_L);
-
-                eeprom.pwm_info = modbus.byte_info_L;
+                ac_dc.channel_num = modbus.byte_info_L;
 
                 break;
             
-            /*  40002  LED 开关状态设置                          */
+            /*  40002   同步状态设置                          */
             case 0x01:
-                led_ctrl(modbus.byte_info_L);
-
-                eeprom.led_info = modbus.byte_info_L;
+                ac_dc.sync_flag = modbus.byte_info_L;
+                sync_ctrl(); 
 
                 break;
 
-            /*  40003 三路220V输出使能设置                          */
+            /*  40003 风速设置                          */
             case 0x02:
-                ac_dc.ac220_out1_enable = (modbus.byte_info_L    & 0x01);
-                ac_dc.ac220_out2_enable = (modbus.byte_info_L>>1 & 0x01);
-                ac_dc.ac220_out3_enable = (modbus.byte_info_L>>2 & 0x01);
-                ac_220v_crl(modbus.byte_info_H);
-
-                eeprom.ac220_switch = modbus.byte_info_L;
-                eeprom.ac220_level  = modbus.byte_info_H;
+                ac_dc.fan_level = modbus.byte_info_L;
+                fan_ctrl(ac_dc.fan_level);
 
                 break;
 
             
-            /*  40004  同步状态设置                   */
+            /*  40004  功率设置                   */
             case 0x03:
-                ac_dc.sync_flag = modbus.byte_info_L;
-                sync_ctrl();
-
-                eeprom.sync_info = modbus.byte_info_L;
+                ac_dc.power_level = modbus.byte_info_L;
+                ac_220v_crl(ac_dc.power_level);
 
                 break;
 
-            /*  40005  工作模式设置                   */
+            /*  40005  报警温度设置                   */
             case 0x04:                                         
-                ac_dc.mode_info = modbus.byte_info_L;
-                if( modbus.byte_info_H == 1)
-                {
-                    mode_ctrl(ac_dc.mode_info);
-                }
-
-                eeprom.mode_info = modbus.byte_info_L;
+                ac_dc.alarm_temp_val = modbus.byte_info_L;
 
                 break;
 
-            /*  40006  报警温度设置                   */
+            /*  40006  模式设置                   */
             case 0x05:                                         
-                temp.temp_alarm_value = modbus.byte_info_L;
-
-                eeprom.temp_alarm_value = modbus.byte_info_L;
+                ac_dc.mode_num = modbus.byte_info_L;
+                eeprom_mode_record();
                 
                 break;
                 

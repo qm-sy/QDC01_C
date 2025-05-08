@@ -177,6 +177,16 @@ u8 KEY_ReadState(u8 keynum)	//读取指定的按键的状态 10ms执行一次
 	}
 }
 
+void key_val_init( void )
+{
+	key_val.key1_scan_allow = 1;       
+    key_val.key2_scan_allow = 1;  
+    key_val.key3_scan_allow = 1;   
+    key_val.key4_scan_allow = 1;   
+    key_val.key5_scan_allow = 1;   
+    key_val.key6_scan_allow = 1; 
+	key_val.key_sacn_flag   = 1;
+}
 void key_scan( void )
 {
 	if( key_val.key_sacn_flag == 1 )
@@ -185,19 +195,22 @@ void key_scan( void )
 		if( KEY_ReadState(KEY4) == KEY_PRESS )											//调节通道
 		{
 			channel_choose();
+			send_to_slave();
 		}
 		if(( KEY_ReadState(KEY2) == KEY_PRESS ) && ( key_val.key2_scan_allow == 1 ))	//调节功率↑
 		{
 			up_key();
+			send_to_slave();
 		}
 		if(( KEY_ReadState(KEY3) == KEY_PRESS ) && ( key_val.key3_scan_allow == 1 ))	//调节功率↓
 		{
 			down_key();
+			send_to_slave();
 		}
 		if(( KEY_ReadState(KEY5) == KEY_PRESS ) && ( key_val.key5_scan_allow == 1 ))
 		{
-			sync_flag = ~sync_flag;
-			sun_dis(sync_flag);
+			mode_choose();
+			get_slave_statu_03();
 		}
 
 		if( KEY_ReadState(KEY6) == KEY_LONGOVER )										//调节风力
@@ -209,15 +222,18 @@ void key_scan( void )
 			if( KEY_ReadState(KEY2) == KEY_PRESS )
 			{
 				fan_up();
+				send_to_slave();
 			}
 			if( KEY_ReadState(KEY3) == KEY_PRESS )
 			{
 				fan_down();
+				send_to_slave();
 			}
 			if( KEY_ReadState(KEY5) == KEY_PRESS )
 			{
-				sync_flag = ~sync_flag;
-				sync_dis(sync_flag);
+				lcd_info.sync_flag = 1 - lcd_info.sync_flag;
+				sync_dis(lcd_info.sync_flag);
+				send_to_slave();
 			}
 		}
 		if( KEY_ReadState(KEY6) == KEY_NOPRESS )//释放按键2、3
@@ -226,24 +242,22 @@ void key_scan( void )
 			key_val.key3_scan_allow = 1;
 			key_val.key5_scan_allow = 1;
 		}
-
-	}
-	
+		//key_val.key_sacn_flag = 0;
+	}	
 }
 
 
 void channel_choose( void )
 {
-	static uint8_t channel_num = 0;
-    if(channel_num==7)
+    if(lcd_info.channel_num == 7)
     {
-        channel_num = 1;
+        lcd_info.channel_num = 1;
     }
     else
     {
-        channel_num += 1;
+        lcd_info.channel_num += 1;
     }
-    channel_dis(channel_num);
+    channel_dis(lcd_info.channel_num);
 }
 
 void up_key( void )
@@ -285,4 +299,35 @@ void fan_down( void )
     }
 
     wind_dis(lcd_info.fan_level);
+}
+
+
+void mode_choose( void )
+{
+
+    if(lcd_info.mode_num < 6)
+    {
+        lcd_info.mode_num++;
+		if( lcd_info.mode_num == 6 )
+		{
+			lcd_info.mode_num = 1;
+		}
+    }
+    
+    screen_clear();                //一次清屏
+
+    mode_dis(DIS_ON);       
+    num_dis(lcd_info.mode_num);           //显示模式序号和标志
+         
+    delay_ms(500);
+    
+    screen_clear();                 //二次清屏
+    
+    mode_dis(DIS_OFF);
+
+    sync_dis(lcd_info.sync_flag);
+    num_dis(lcd_info.power_level);
+    channel_dis(3);
+    percentage_dis(DIS_ON);
+    wind_dis(lcd_info.fan_level);         
 }

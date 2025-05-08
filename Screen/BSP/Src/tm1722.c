@@ -15,8 +15,6 @@ uint8_t addr_tab[7] = { 0xc3,0xc6,0xc7,0xca,0xcb,0xce,0xcf};
 uint8_t num_tab[10] = {0xF5,0x05,0xD3,0x97,0x27,0xB6,0xF6,0x15,0xF7,0xB7};
                      /*  0    1    2    3    4    5    6    7    8    9  */
 
-bit  sync_flag = 0;  
-
 void screen_init( void )
 {
     WR = 1;            //端口配置初始化
@@ -34,8 +32,13 @@ void screen_init( void )
  
 void lcd_info_init( void )
 {
-    lcd_info.power_level = 50;
-    lcd_info.fan_level = 3;
+    lcd_info.channel_num = 0;
+    lcd_info.power_level = 0;
+    lcd_info.fan_level = 0;
+    lcd_info.sync_flag = 0;
+    lcd_info.mode_num  = 1;
+
+    lcd_info.lcd_connect_flag = 0;
 }
 
 void led_status( uint8_t status ) 
@@ -62,12 +65,12 @@ void led_status( uint8_t status )
 void screen_clear( void ) //清显示缓存
 {
     uint8_t i;
-                 
+    alarm_dis(0);
+    Celsius_dis(0);
+    sync_dis(0);
     for(i = 0;i < 7;i++)
     {
-        TM1722_Write_Byte(addr_tab[i]);
-        TM1722_Write_Byte(0);
-        WR = 1;    
+        screen_write_val(addr_tab[i],0);
     }
 }
 
@@ -338,9 +341,9 @@ void screen_all_dis( void )
 {
     num_dis(lcd_info.power_level);
     wind_dis(lcd_info.fan_level);
-    channel_dis(3);
+    channel_dis(lcd_info.channel_num);
+    sync_dis(lcd_info.sync_flag);
     sun_dis(DIS_ON);
-    sync_dis(sync_flag);
     alarm_dis(DIS_ON);
     Celsius_dis(DIS_ON);
     mode_dis(DIS_ON);

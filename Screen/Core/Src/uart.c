@@ -40,6 +40,7 @@ void Uart1_Init(void)	//115200bps@11.0592MHz
 **/
 void Uart4_Init(void)	//115200bps@11.0592MHz
 {
+	P_SW2 |= 0x04;
 	S4CON  = 0x10;		//8位数据,可变波特率
 	S4CON |= 0x40;		//串口4选择定时器4为波特率发生器
 

@@ -5,6 +5,7 @@
 #include "tm1722.h"
 #include "uart.h"
 #include "communication.h"
+#include "tim.h"
 
 u8	isr_index;
 
@@ -19,30 +20,35 @@ void main(void)
 	/*  调试使用 printf  */
 	Uart1_Init();
 
-    EA = 1;     //打开总中断
+	Timer3_Init();
 
+	Uart4_Init();
+	Uart4_Send_Statu_Init();    //接收发送初始化
+    Timer0_Init();              //不定长数据接收
+
+    EA = 1;     //打开总中断
 	BL = 0;
-	screen_init();
 	lcd_info_init();
+	screen_init();
+	while ( lcd_info.lcd_connect_flag == 0 )
+	{
+		get_slave_statu_03();
+		Modbus_Event();
+		delay_ms(50);
+	}
+	
+
 	screen_all_dis();
+
 	KEY_T_Init(); 	
-	//LoadToLcd();	
-	key_val.key1_scan_allow = 1;       
-    key_val.key2_scan_allow = 1;  
-    key_val.key3_scan_allow = 1;   
-    key_val.key4_scan_allow = 1;   
-    key_val.key5_scan_allow = 1;   
-    key_val.key6_scan_allow = 1; 
-	key_val.key_sacn_flag   = 1;
+	key_val_init();
 	printf("====== code start ====== \r\n");
 
     while(1)
     {
-		i = KEY_ReadState(KEY6);
-		printf("The value is %d \r\n",(int)i);
+		Modbus_Event();
 		key_scan();
 		delay_ms(10);
-	
 	}
 
 

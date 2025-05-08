@@ -8,7 +8,8 @@
 ".\Output\communication.obj",
 ".\Output\tm1722.obj",
 ".\Output\delay.obj",
-".\Output\modbus_rtu.obj" 
+".\Output\modbus_rtu.obj",
+".\Output\common.obj" 
 TO ".\Output\Screen_485" 
 
 PRINT(".\Screen_485.map") REMOVEUNUSED 

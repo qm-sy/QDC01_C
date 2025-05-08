@@ -1,9 +1,9 @@
-A51 MACRO ASSEMBLER  ISR                                                                  05/08/2025 14:13:56 PAGE     1
+A51 MACRO ASSEMBLER  ISR                                                                  05/09/2025 01:35:28 PAGE     1
 
 
 MACRO ASSEMBLER A51 V8.2.7.0
 OBJECT MODULE PLACED IN .\Output\isr.obj
-ASSEMBLER INVOKED BY: D:\APP\Keil_v5\C51\BIN\A51.EXE isr.asm SET(LARGE) DEBUG OBJECT(.\Output\isr.obj) EP
+ASSEMBLER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\A51.EXE isr.asm SET(LARGE) DEBUG OBJECT(.\Output\isr.obj) EP
 
 LOC  OBJ            LINE     SOURCE
 
@@ -12,7 +12,7 @@ LOC  OBJ            LINE     SOURCE
 011B 02006B            3             LJMP    006BH                   ;跳转到中断号13的向量
                        4     
                        5             END
-A51 MACRO ASSEMBLER  ISR                                                                  05/08/2025 14:13:56 PAGE     2
+A51 MACRO ASSEMBLER  ISR                                                                  05/09/2025 01:35:28 PAGE     2
 
 SYMBOL TABLE LISTING
 ------ ----- -------

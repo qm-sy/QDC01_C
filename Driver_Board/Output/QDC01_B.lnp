@@ -7,7 +7,6 @@
 "..\Output\tim.obj",
 "..\Output\uart.obj",
 "..\Output\communication.obj",
-"..\Output\dht11.obj",
 "..\Output\eeprom_crl.obj",
 "..\Output\ntc.obj",
 "..\Output\power_crl.obj",

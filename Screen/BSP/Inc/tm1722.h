@@ -4,6 +4,7 @@
 #include "stc.h" 
 #include "gpio.h"
 #include "delay.h"
+#include "modbus_rtu.h"
 
 #define COM1_L 0X01
 #define COM2_L 0X02
@@ -40,12 +41,17 @@ extern uint8_t value_0F;
 
 extern uint8_t addr_tab[7];
 extern uint8_t num_tab[10];
-extern bit sync_flag;
 
 typedef struct 
 {
     uint8_t  power_level;       
     uint8_t  fan_level;  
+    uint8_t  sync_flag;
+    uint8_t  mode_num;
+    uint8_t  channel_num;
+    uint8_t  alarm_temp_val;
+
+    uint8_t lcd_connect_flag;
 }LCD_INFO;
 
 extern LCD_INFO lcd_info;
