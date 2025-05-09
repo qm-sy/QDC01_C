@@ -40,6 +40,9 @@ void lcd_info_init( void )
 
     lcd_info.fan_rotate_flag = 1;
     lcd_info.lcd_connect_flag = 0;
+    lcd_info.alarm_set_flag = 0;
+    lcd_info.alarm_temp_flick_flag = 0;
+    lcd_info.power_on = 0;
 }
 
 void led_status( uint8_t status ) 
@@ -53,9 +56,9 @@ void led_status( uint8_t status )
         break;
     
         case LED_SLEEP:
-        BL = 0;
-        LED1 = LED_ON;
-        LED2 = LED3 = LED4 = LED5 = LED6 = LED_OFF;
+        BL = 1;
+        LED3 = LED_ON;
+        LED2 = LED1 = LED4 = LED5 = LED6 = LED_OFF;
         
         break;
 
@@ -204,6 +207,11 @@ void channel_dis(uint8_t num)
     
     switch(num)
     {
+        case 0:
+            value_0E &= 0x00;
+            value_0B &= 0x00;
+            break;
+
         case 1:
             value_0E |= 0x04;
             value_0B |= 0x40;
@@ -341,24 +349,54 @@ void fan_leaf2_dis(uint8_t on_off)
 }
 
 void fan_rotate()
-{
-    fan_center_dis(DIS_ON);
-    if(( lcd_info.signal_in == 1) || (lcd_info.sync_flag == 0))
-    {
-        if( lcd_info.fan_level > 0 )
+{  
+    if( lcd_info.alarm_set_flag == 0 )
+    {   
+        fan_center_dis(DIS_ON);
+        if(( lcd_info.signal_in == 1) || (lcd_info.sync_flag == 0))
         {
-            fan_leaf1_dis(lcd_info.fan_rotate_flag);
-            fan_leaf2_dis(1 - lcd_info.fan_rotate_flag);
+            if( lcd_info.fan_level > 0 )
+            {
+                fan_leaf1_dis(lcd_info.fan_rotate_flag);
+                fan_leaf2_dis(1 - lcd_info.fan_rotate_flag);
+            }
+            sun_dis(DIS_ON);
+        }else
+        {
+            fan_leaf1_dis(DIS_ON);
+            fan_leaf2_dis(DIS_OFF);
+            sun_dis(DIS_OFF);
         }
-        sun_dis(DIS_ON);
-    }else
-    {
-        fan_leaf1_dis(DIS_ON);
-        fan_leaf2_dis(DIS_OFF);
-        sun_dis(DIS_OFF);
     }
 }
 
+void alarm_temp_flick( void )
+{
+    static uint8_t now_val = 0;
+    if( now_val != lcd_info.alarm_temp_flick_flag )
+    {
+        if( lcd_info.alarm_set_flag == 1 )
+        {
+            if( lcd_info.alarm_temp_flick_flag == 1 )
+            {
+                num_dis(lcd_info.alarm_temp_val);
+                Celsius_dis(DIS_ON);
+            }else
+            {
+                screen_clear();
+                fan_leaf1_dis(DIS_OFF);
+                fan_leaf2_dis(DIS_OFF);
+                fan_center_dis(DIS_OFF);
+                Celsius_dis(DIS_ON);
+                sun_dis(DIS_OFF);
+                wind_dis(0);
+                channel_dis(0);
+            }
+        } 
+        now_val = lcd_info.alarm_temp_flick_flag;
+    }
+    
+}
 void screen_all_dis( void )
 {
     num_dis(lcd_info.power_level);
@@ -373,4 +411,5 @@ void screen_all_dis( void )
         sun_dis(DIS_ON);
     }
     percentage_dis(DIS_ON);
+    Celsius_dis(DIS_OFF);
 }

@@ -38,7 +38,7 @@ void Modbus_Event( void )
                     case 0x04:		Modbus_Fun4();		break;
                     case 0x06:		Modbus_Fun6();      break;    
 
-                    case 0x10:                          break;  
+                    case 0x10:      Modbus_Fun16();     break;  
                     default:                            break;
                 }
             }
@@ -91,6 +91,7 @@ void Modbus_Fun3()
     }
     lcd_info.lcd_connect_flag = 1;
     screen_all_dis();
+    modbus.scan_flag_04_allow = 1;
 }
 
 
@@ -115,11 +116,23 @@ void Modbus_Fun4()
 }
 
 
-void Modbus_Fun6()
+void Modbus_Fun6( void )
 {
-    get_slave_params_03();
+    if(rs485.RX4_buf[3] == 0x05)
+    {
+        get_slave_params_03();
+    }
+    if(rs485.RX4_buf[3] == 0x03)
+    {
+        modbus.scan_flag_04_allow = 1;
+    }
+    
 }
 
+void Modbus_Fun16( void )
+{
+    modbus.scan_flag_04_allow = 1;
+}
 
 /**
  * @brief	从机回复主机
@@ -318,9 +331,59 @@ void send_to_slave_16( void )
 
 void get_slave_status( void )
 {
-    if( modbus.scan_flag_04 == 1)
+    if(( modbus.scan_flag_04 == 1) && ( modbus.scan_flag_04_allow == 1 ))
     {
         get_slave_statu_04();
         modbus.scan_flag_04 = 0;
     }
+}
+
+void slave_sleep_ctrl( void )
+{
+    uint8_t send_buf[8];
+    uint16_t crc;
+
+    send_buf[0] = 0xDC;
+    send_buf[1] = 0x06;
+    send_buf[2] = 0x00;
+    send_buf[3] = 0x04;
+    send_buf[4] = 0x00;
+    send_buf[5] = 0x01;
+   
+    crc = MODBUS_CRC16(send_buf,6);
+    send_buf[6] = crc>>8;
+    send_buf[7] = crc;
+
+    memcpy(rs485.TX4_buf,send_buf,8);
+   
+    rs485.TX4_send_bytelength = 8;
+    DR_485 = 1;                                 //485可以发送
+    delay_ms(2);
+    S4CON |= S4TI;                              //开始发送
+    delay_ms(1);
+}
+
+void slave_work_ctrl( void )
+{
+    uint8_t send_buf[8];
+    uint16_t crc;
+
+    send_buf[0] = 0xDC;
+    send_buf[1] = 0x06;
+    send_buf[2] = 0x00;
+    send_buf[3] = 0x03;
+    send_buf[4] = 0x00;
+    send_buf[5] = 0x01;
+   
+    crc = MODBUS_CRC16(send_buf,6);
+    send_buf[6] = crc>>8;
+    send_buf[7] = crc;
+
+    memcpy(rs485.TX4_buf,send_buf,8);
+   
+    rs485.TX4_send_bytelength = 8;
+    DR_485 = 1;                                 //485可以发送
+    delay_ms(2);
+    S4CON |= S4TI;                              //开始发送
+    delay_ms(1);
 }

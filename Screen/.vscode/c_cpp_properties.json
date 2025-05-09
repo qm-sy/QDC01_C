@@ -3,14 +3,14 @@
         {
             "name": "LED",
             "includePath": [
-                "d:\\workspace\\QDC01_C\\Screen\\BSP\\Inc",
-                "d:\\workspace\\QDC01_C\\Screen\\Core\\Inc",
-                "d:\\workspace\\QDC01_C\\Screen\\Emembed\\Inc",
-                "D:\\APP\\Keil_v5\\C51\\INC",
-                "d:\\workspace\\QDC01_C\\Screen",
-                "d:\\workspace\\QDC01_C\\Screen\\Core\\Src",
-                "d:\\workspace\\QDC01_C\\Screen\\BSP\\Src",
-                "d:\\workspace\\QDC01_C\\Screen\\Emembed\\Src"
+                "e:\\workspace\\QDC01_C\\Screen\\BSP\\Inc",
+                "e:\\workspace\\QDC01_C\\Screen\\Core\\Inc",
+                "e:\\workspace\\QDC01_C\\Screen\\Emembed\\Inc",
+                "D:\\APP\\Keil_STM32\\C51\\INC",
+                "e:\\workspace\\QDC01_C\\Screen",
+                "e:\\workspace\\QDC01_C\\Screen\\Core\\Src",
+                "e:\\workspace\\QDC01_C\\Screen\\BSP\\Src",
+                "e:\\workspace\\QDC01_C\\Screen\\Emembed\\Src"
             ],
             "defines": [
                 "__C51__",
@@ -38,7 +38,7 @@
             ],
             "intelliSenseMode": "${default}",
             "forcedInclude": [
-                "c:/Users/qm/.vscode/extensions/richintelligent.richextension-3.1.10/include/libRichForced.h"
+                "c:/Users/qmsy/.vscode/extensions/richintelligent.richextension-3.1.10/include/libRichForced.h"
             ]
         }
     ],

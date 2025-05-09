@@ -27,10 +27,18 @@ void main(void)
     Timer0_Init();              //不定长数据接收
 
     EA = 1;     //打开总中断
-	BL = 0;
+	
+	led_status(LED_SLEEP);
 	lcd_info_init();
+	KEY_T_Init(); 	
+	key_val_init();
+	while(lcd_info.power_on == 0)
+	{
+		key_scan();
+		delay_ms(10);
+	}
 	screen_init();
-	while ( lcd_info.lcd_connect_flag == 0 )
+	while ( lcd_info.lcd_connect_flag == 0 ) 
 	{
 		get_slave_params_03();
 		Modbus_Event();
@@ -40,8 +48,6 @@ void main(void)
 	screen_clear();
 	screen_all_dis();
 
-	KEY_T_Init(); 	
-	key_val_init();
 	printf("====== code start ====== \r\n");
 
     while(1)
@@ -50,6 +56,8 @@ void main(void)
 		key_scan();
 		fan_rotate();
 		get_slave_status();
+		alarm_temp_flick();
+
 		delay_ms(10);
 	}
 

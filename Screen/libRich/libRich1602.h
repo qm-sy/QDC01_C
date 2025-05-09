@@ -20,9 +20,9 @@ void libRich1602_Init();
 /// @brief 显示一个字符
 /// @param x LCD1602上的列坐标。取值范围[0, 15]。0代表在最左侧显示，15代表在最右侧显示。
 /// @param y LCD1602上的行坐标。取值范围[0, 1]。0代表在第一行显示，1代表在第二行显示。
-/// @param byte 要显示的字符。可用'Z'的形式传参，也可以直接使用字符的ASCII码所对应的十进制值和十六进制值传参。
+/// @param ch 要显示的字符。可用'Z'的形式传参，也可以直接使用字符的ASCII码所对应的十进制值和十六进制值传参。
 /// @attention 对于ASCII码值和LCD1602字模库代码值不同的字符，请直接传入其字模库代码值对应的十进制值或十六进制值。
-void libRich1602_Char(unsigned char x, unsigned char y, unsigned char byte);
+void libRich1602_Char(unsigned char x, unsigned char y, unsigned char ch);
 
 /// @brief 显示一个字符串。
 /// @param x LCD1602上的列坐标。取值范围[0, 15]。0代表在最左侧显示，15代表在最右侧显示。
@@ -34,14 +34,14 @@ void libRich1602_String(unsigned char x, unsigned char y, const char *message);
 /// @brief 以二进制形式显示一字节数据，高位在前，低位在后。
 /// @param x LCD1602上的列坐标。取值范围[0, 15]。0代表在最左侧显示，15代表在最右侧显示。
 /// @param y LCD1602上的行坐标。取值范围[0, 1]。0代表在第一行显示，1代表在第二行显示。
-/// @param byte 要显示的字节数据。
-void libRich1602_Bin(unsigned char x, unsigned char y, unsigned char byte);
+/// @param binary 要显示的字节数据。
+void libRich1602_Bin(unsigned char x, unsigned char y, unsigned char binary);
 
 /// @brief 以十进制形式显示整型数据。
 /// @param x LCD1602上的列坐标。取值范围[0, 15]。0代表在最左侧显示，15代表在最右侧显示。
 /// @param y LCD1602上的行坐标。取值范围[0, 1]。0代表在第一行显示，1代表在第二行显示。
-/// @param value 要显示的整型数据。
-void libRich1602_Dec(unsigned char x, unsigned char y, long value);
+/// @param longInteger 要显示的整型数据。
+void libRich1602_Dec(unsigned char x, unsigned char y, long longInteger);
 
 /// @brief 以十进制形式显示浮点数据。
 /// @param x LCD1602上的列坐标。取值范围[0, 15]。0代表在最左侧显示，15代表在最右侧显示。
@@ -53,8 +53,8 @@ void libRich1602_Float(unsigned char x, unsigned char y, float value, unsigned c
 /// @brief 以十六进制形式显示一字节数据。
 /// @param x LCD1602上的列坐标。取值范围[0, 15]。0代表在最左侧显示，15代表在最右侧显示。
 /// @param y LCD1602上的行坐标。取值范围[0, 1]。0代表在第一行显示，1代表在第二行显示。
-/// @param byte 要以十六进制显示的一字节数据。
-void libRich1602_Hex(unsigned char x, unsigned char y, unsigned char byte);
+/// @param hex 要以十六进制显示的一字节数据。
+void libRich1602_Hex(unsigned char x, unsigned char y, unsigned char hex);
 
 /// @brief 清除LCD1602显示、清除DDRAM、光标复位、显示窗口复位。
 void libRich1602_Clear();

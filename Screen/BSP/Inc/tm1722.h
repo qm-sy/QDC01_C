@@ -55,6 +55,9 @@ typedef struct
     
     uint8_t lcd_connect_flag;
     uint8_t fan_rotate_flag;
+    uint8_t alarm_set_flag;
+    uint8_t alarm_temp_flick_flag;
+    uint8_t power_on;
 }LCD_INFO;
 
 extern LCD_INFO lcd_info;
@@ -79,8 +82,8 @@ void percentage_dis(uint8_t on_off);
 void fan_center_dis(uint8_t on_off);
 void fan_leaf1_dis(uint8_t on_off);
 void fan_leaf2_dis(uint8_t on_off);
-void fan_rotate();
-
+void fan_rotate( void );
+void alarm_temp_flick( void );
 void screen_all_dis( void );
 void led_status( uint8_t status); 
 

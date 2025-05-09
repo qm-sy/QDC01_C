@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 16:55:13 PAGE 1   
+C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE TM1722
 OBJECT MODULE PLACED IN .\Output\tm1722.obj
-COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE BSP\Src\tm1722.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP\In
-                    -c;.\Core\Inc;.\Emembed\Inc) DEBUG PRINT(.\tm1722.lst) OBJECT(.\Output\tm1722.obj)
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE BSP\Src\tm1722.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP
+                    -\Inc;.\Core\Inc;.\Emembed\Inc) DEBUG PRINT(.\tm1722.lst) OBJECT(.\Output\tm1722.obj)
 
 line level    source
 
@@ -50,363 +50,404 @@ line level    source
   40   1      
   41   1          lcd_info.fan_rotate_flag = 1;
   42   1          lcd_info.lcd_connect_flag = 0;
-  43   1      }
-  44          
-  45          void led_status( uint8_t status ) 
-  46          {
-  47   1          switch (status)
-  48   1          {
-  49   2              case LED_OPEN:
-  50   2              BL = 0;
-  51   2              LED1 = LED2 = LED3 = LED4 = LED5 = LED6 = LED_ON;
-  52   2      
-  53   2              break;
-  54   2          
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 16:55:13 PAGE 2   
+  43   1          lcd_info.alarm_set_flag = 0;
+  44   1          lcd_info.alarm_temp_flick_flag = 0;
+  45   1          lcd_info.power_on = 0;
+  46   1      }
+  47          
+  48          void led_status( uint8_t status ) 
+  49          {
+  50   1          switch (status)
+  51   1          {
+  52   2              case LED_OPEN:
+  53   2              BL = 0;
+  54   2              LED1 = LED2 = LED3 = LED4 = LED5 = LED6 = LED_ON;
+C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 2   
 
-  55   2              case LED_SLEEP:
-  56   2              BL = 0;
-  57   2              LED1 = LED_ON;
-  58   2              LED2 = LED3 = LED4 = LED5 = LED6 = LED_OFF;
-  59   2              
-  60   2              break;
-  61   2      
-  62   2          default:
+  55   2      
+  56   2              break;
+  57   2          
+  58   2              case LED_SLEEP:
+  59   2              BL = 1;
+  60   2              LED3 = LED_ON;
+  61   2              LED2 = LED1 = LED4 = LED5 = LED6 = LED_OFF;
+  62   2              
   63   2              break;
-  64   2          }
-  65   1      }
-  66          void screen_clear( void ) //清显示缓存
-  67          {
-  68   1          uint8_t i;
-  69   1          alarm_dis(0);
-  70   1          Celsius_dis(0);
-  71   1          sync_dis(0);
-  72   1          percentage_dis(0);
-  73   1          mode_dis(0);
-  74   1          for(i = 0;i < 7;i++)
-  75   1          {
-  76   2              screen_write_val(addr_tab[i],0);
-  77   2          }
-  78   1      }
-  79          
-  80          void screen_display( void )  //显示开
-  81          {
-  82   1          TM1722_Write_Byte(0x93); 
-  83   1          WR = 1;
-  84   1      }
-  85          
-  86          void screen_write_val(uint8_t addr,uint8_t dat)
-  87          {
-  88   1          TM1722_Write_Byte(addr); 
-  89   1          TM1722_Write_Byte(dat); 
-  90   1          WR = 1;
-  91   1      }
-  92          
-  93          void TM1722_Write_Byte(uint8_t dat)
-  94          {
-  95   1        uint8_t i;
-  96   1               
-  97   1        delay_us(50); //用于片选信号的延时
-  98   1        WR = 0;     //有效的片选信号
-  99   1        for(i = 0;i < 8;i++)
- 100   1        {
- 101   2          CS  =  0;
- 102   2          DATA  =  dat&0x01;
- 103   2          CS  =  1;    //时钟上升沿，送入一位数据
- 104   2          dat >>= 1;      
- 105   2        }
- 106   1        delay_us(50);   //用于片选信号的延时
- 107   1      }
- 108          
- 109          void num_dis(uint8_t num)
- 110          {
- 111   1          uint8_t hundreds = num / 100;  // 获取百位数
- 112   1          uint8_t tens = (num / 10) % 10;  // 获取十位数
- 113   1          uint8_t ones = num % 10;  // 获取个位数
- 114   1          
- 115   1          value_0B &= 0x00;
- 116   1          value_0A &= 0X00;
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 16:55:13 PAGE 3   
+  64   2      
+  65   2          default:
+  66   2              break;
+  67   2          }
+  68   1      }
+  69          void screen_clear( void ) //清显示缓存
+  70          {
+  71   1          uint8_t i;
+  72   1          alarm_dis(0);
+  73   1          Celsius_dis(0);
+  74   1          sync_dis(0);
+  75   1          percentage_dis(0);
+  76   1          mode_dis(0);
+  77   1          for(i = 0;i < 7;i++)
+  78   1          {
+  79   2              screen_write_val(addr_tab[i],0);
+  80   2          }
+  81   1      }
+  82          
+  83          void screen_display( void )  //显示开
+  84          {
+  85   1          TM1722_Write_Byte(0x93); 
+  86   1          WR = 1;
+  87   1      }
+  88          
+  89          void screen_write_val(uint8_t addr,uint8_t dat)
+  90          {
+  91   1          TM1722_Write_Byte(addr); 
+  92   1          TM1722_Write_Byte(dat); 
+  93   1          WR = 1;
+  94   1      }
+  95          
+  96          void TM1722_Write_Byte(uint8_t dat)
+  97          {
+  98   1        uint8_t i;
+  99   1               
+ 100   1        delay_us(50); //用于片选信号的延时
+ 101   1        WR = 0;     //有效的片选信号
+ 102   1        for(i = 0;i < 8;i++)
+ 103   1        {
+ 104   2          CS  =  0;
+ 105   2          DATA  =  dat&0x01;
+ 106   2          CS  =  1;    //时钟上升沿，送入一位数据
+ 107   2          dat >>= 1;      
+ 108   2        }
+ 109   1        delay_us(50);   //用于片选信号的延时
+ 110   1      }
+ 111          
+ 112          void num_dis(uint8_t num)
+ 113          {
+ 114   1          uint8_t hundreds = num / 100;  // 获取百位数
+ 115   1          uint8_t tens = (num / 10) % 10;  // 获取十位数
+ 116   1          uint8_t ones = num % 10;  // 获取个位数
+C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 3   
 
- 117   1          value_07 &= 0X00;
- 118   1          value_06 &= 0X08;
- 119   1          
- 120   1          value_0B |= (num_tab[hundreds]>>4);
- 121   1          value_0A |= num_tab[hundreds];
- 122   1          value_07 |= num_tab[tens];
- 123   1          value_06 |= num_tab[ones]; 
- 124   1      
- 125   1          if((num<10)&&(num>=0))
- 126   1          {
- 127   2              screen_write_val(addr_tab[ADDR_0B],0x00);
- 128   2      
- 129   2              screen_write_val(addr_tab[ADDR_0A],0X00);
- 130   2              
- 131   2              screen_write_val(addr_tab[ADDR_07],0X00);
- 132   2      
- 133   2              screen_write_val(addr_tab[ADDR_06],value_06);  
- 134   2          }
- 135   1          else if((num<100)&&(num>=10))
- 136   1          {
- 137   2              screen_write_val(addr_tab[ADDR_0B],0x00);
- 138   2      
- 139   2              screen_write_val(addr_tab[ADDR_0A],0X00);
- 140   2              
- 141   2              screen_write_val(addr_tab[ADDR_07],value_07);
- 142   2      
- 143   2              screen_write_val(addr_tab[ADDR_06],value_06);   
- 144   2          }
- 145   1          else
- 146   1          {
- 147   2              screen_write_val(addr_tab[ADDR_0B],value_0B);
- 148   2              
- 149   2              screen_write_val(addr_tab[ADDR_0A],value_0A);
- 150   2              
- 151   2              screen_write_val(addr_tab[ADDR_07],value_07);
- 152   2      
- 153   2              screen_write_val(addr_tab[ADDR_06],value_06);
- 154   2          }
- 155   1      }
- 156          
- 157          
- 158          void wind_dis(uint8_t num)
- 159          {
- 160   1          value_0F &= 0x30;
- 161   1          
- 162   1          switch(num)
- 163   1          {
- 164   2              case 0:
- 165   2                  value_0F |= 0x00;
- 166   2                  break;
- 167   2              
- 168   2              case 1:
- 169   2                  value_0F |= 0x40;
- 170   2                  break;
- 171   2              
- 172   2              case 2:
- 173   2                  value_0F |= 0xc0;
- 174   2                  break;
- 175   2              
- 176   2              case 3:
- 177   2                  value_0F |= 0xc8;
- 178   2                  break;
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 16:55:13 PAGE 4   
+ 117   1          
+ 118   1          value_0B &= 0x00;
+ 119   1          value_0A &= 0X00;
+ 120   1          value_07 &= 0X00;
+ 121   1          value_06 &= 0X08;
+ 122   1          
+ 123   1          value_0B |= (num_tab[hundreds]>>4);
+ 124   1          value_0A |= num_tab[hundreds];
+ 125   1          value_07 |= num_tab[tens];
+ 126   1          value_06 |= num_tab[ones]; 
+ 127   1      
+ 128   1          if((num<10)&&(num>=0))
+ 129   1          {
+ 130   2              screen_write_val(addr_tab[ADDR_0B],0x00);
+ 131   2      
+ 132   2              screen_write_val(addr_tab[ADDR_0A],0X00);
+ 133   2              
+ 134   2              screen_write_val(addr_tab[ADDR_07],0X00);
+ 135   2      
+ 136   2              screen_write_val(addr_tab[ADDR_06],value_06);  
+ 137   2          }
+ 138   1          else if((num<100)&&(num>=10))
+ 139   1          {
+ 140   2              screen_write_val(addr_tab[ADDR_0B],0x00);
+ 141   2      
+ 142   2              screen_write_val(addr_tab[ADDR_0A],0X00);
+ 143   2              
+ 144   2              screen_write_val(addr_tab[ADDR_07],value_07);
+ 145   2      
+ 146   2              screen_write_val(addr_tab[ADDR_06],value_06);   
+ 147   2          }
+ 148   1          else
+ 149   1          {
+ 150   2              screen_write_val(addr_tab[ADDR_0B],value_0B);
+ 151   2              
+ 152   2              screen_write_val(addr_tab[ADDR_0A],value_0A);
+ 153   2              
+ 154   2              screen_write_val(addr_tab[ADDR_07],value_07);
+ 155   2      
+ 156   2              screen_write_val(addr_tab[ADDR_06],value_06);
+ 157   2          }
+ 158   1      }
+ 159          
+ 160          
+ 161          void wind_dis(uint8_t num)
+ 162          {
+ 163   1          value_0F &= 0x30;
+ 164   1          
+ 165   1          switch(num)
+ 166   1          {
+ 167   2              case 0:
+ 168   2                  value_0F |= 0x00;
+ 169   2                  break;
+ 170   2              
+ 171   2              case 1:
+ 172   2                  value_0F |= 0x40;
+ 173   2                  break;
+ 174   2              
+ 175   2              case 2:
+ 176   2                  value_0F |= 0xc0;
+ 177   2                  break;
+ 178   2              
+C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 4   
 
- 179   2              
- 180   2              case 4:
- 181   2                  value_0F |= 0xcc;
- 182   2                  break;
- 183   2              
- 184   2              case 5:
- 185   2                  value_0F |= 0xce;
- 186   2                  break;
- 187   2              
- 188   2              case 6:
- 189   2                  value_0F |= 0xcf;
- 190   2                  break;
- 191   2              
- 192   2              default:
+ 179   2              case 3:
+ 180   2                  value_0F |= 0xc8;
+ 181   2                  break;
+ 182   2              
+ 183   2              case 4:
+ 184   2                  value_0F |= 0xcc;
+ 185   2                  break;
+ 186   2              
+ 187   2              case 5:
+ 188   2                  value_0F |= 0xce;
+ 189   2                  break;
+ 190   2              
+ 191   2              case 6:
+ 192   2                  value_0F |= 0xcf;
  193   2                  break;
- 194   2          }
- 195   1          
- 196   1          screen_write_val(addr_tab[ADDR_0F],value_0F);
- 197   1      }
- 198          
- 199          
- 200          void channel_dis(uint8_t num)
- 201          {
- 202   1          value_0E &= 0x80;
- 203   1          value_0B &= 0x00;
- 204   1          
- 205   1          switch(num)
- 206   1          {
- 207   2              case 1:
- 208   2                  value_0E |= 0x04;
- 209   2                  value_0B |= 0x40;
- 210   2                  break;
- 211   2              
- 212   2              case 2:
- 213   2                  value_0E |= 0x02;
- 214   2                  value_0B |= 0x20;
- 215   2                  break;
- 216   2              
- 217   2              case 3:
- 218   2                  value_0E |= 0x01;
- 219   2                  value_0B |= 0x10;
- 220   2                  break;
- 221   2              
- 222   2              case 4:
- 223   2                  value_0E |= 0x06;
- 224   2                  value_0B |= 0x60;
- 225   2                  break;
- 226   2              
- 227   2              case 5:
- 228   2                  value_0E |= 0x05;
- 229   2                  value_0B |= 0x50;
- 230   2                  break;
- 231   2              
- 232   2              case 6:
- 233   2                  value_0E |= 0x03;
- 234   2                  value_0B |= 0x30;
- 235   2                  break;
- 236   2              
- 237   2              case 7:
- 238   2                  value_0E |= 0x07;
- 239   2                  value_0B |= 0x70;
- 240   2                  break;
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 16:55:13 PAGE 5   
+ 194   2              
+ 195   2              default:
+ 196   2                  break;
+ 197   2          }
+ 198   1          
+ 199   1          screen_write_val(addr_tab[ADDR_0F],value_0F);
+ 200   1      }
+ 201          
+ 202          
+ 203          void channel_dis(uint8_t num)
+ 204          {
+ 205   1          value_0E &= 0x80;
+ 206   1          value_0B &= 0x00;
+ 207   1          
+ 208   1          switch(num)
+ 209   1          {
+ 210   2              case 0:
+ 211   2                  value_0E &= 0x00;
+ 212   2                  value_0B &= 0x00;
+ 213   2                  break;
+ 214   2      
+ 215   2              case 1:
+ 216   2                  value_0E |= 0x04;
+ 217   2                  value_0B |= 0x40;
+ 218   2                  break;
+ 219   2              
+ 220   2              case 2:
+ 221   2                  value_0E |= 0x02;
+ 222   2                  value_0B |= 0x20;
+ 223   2                  break;
+ 224   2              
+ 225   2              case 3:
+ 226   2                  value_0E |= 0x01;
+ 227   2                  value_0B |= 0x10;
+ 228   2                  break;
+ 229   2              
+ 230   2              case 4:
+ 231   2                  value_0E |= 0x06;
+ 232   2                  value_0B |= 0x60;
+ 233   2                  break;
+ 234   2              
+ 235   2              case 5:
+ 236   2                  value_0E |= 0x05;
+ 237   2                  value_0B |= 0x50;
+ 238   2                  break;
+ 239   2              
+ 240   2              case 6:
+C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 5   
 
- 241   2              
- 242   2              default:
+ 241   2                  value_0E |= 0x03;
+ 242   2                  value_0B |= 0x30;
  243   2                  break;
- 244   2          }
- 245   1          
- 246   1          screen_write_val(addr_tab[ADDR_0E],value_0E);
- 247   1          screen_write_val(addr_tab[ADDR_0B],value_0B);
- 248   1      }
- 249          
- 250          
- 251          void sun_dis(uint8_t on_off)
- 252          {
- 253   1          value_0E &= 0xf7;
- 254   1          if(on_off==DIS_ON)
- 255   1          {
- 256   2              value_0E |= 0x08;   
- 257   2          }
- 258   1          screen_write_val(addr_tab[ADDR_0E],value_0E);
- 259   1      }
- 260          
- 261          void sync_dis(uint8_t on_off)
- 262          {
- 263   1          value_03 &= 0xef;
- 264   1          if(on_off==DIS_ON)
- 265   1          {
- 266   2              value_03 |= 0x10;   
- 267   2          }
- 268   1          screen_write_val(addr_tab[ADDR_03],value_03);
- 269   1      }
- 270          
- 271          void alarm_dis(uint8_t on_off)
- 272          {
- 273   1          value_03 &= 0xdf;
- 274   1          if(on_off==DIS_ON)
- 275   1          {
- 276   2              value_03 |= 0x20;   
- 277   2          }
- 278   1          screen_write_val(addr_tab[ADDR_03],value_03);
- 279   1      }
- 280          
- 281          
- 282          void Celsius_dis(uint8_t on_off)
- 283          {
- 284   1          value_03 &= 0xbf;
- 285   1          if(on_off==DIS_ON)
- 286   1          {
- 287   2              value_03 |= 0x40;   
- 288   2          }
- 289   1          screen_write_val(addr_tab[ADDR_03],value_03);
- 290   1      }
- 291          
- 292          void mode_dis(uint8_t on_off)
- 293          {
- 294   1          value_03 &= 0x7f;
- 295   1          if(on_off==DIS_ON)
- 296   1          {
- 297   2              value_03 |= 0x80;   
- 298   2          }
- 299   1          screen_write_val(addr_tab[ADDR_03],value_03);
- 300   1      }
- 301          
- 302          void percentage_dis(uint8_t on_off)
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 16:55:13 PAGE 6   
+ 244   2              
+ 245   2              case 7:
+ 246   2                  value_0E |= 0x07;
+ 247   2                  value_0B |= 0x70;
+ 248   2                  break;
+ 249   2              
+ 250   2              default:
+ 251   2                  break;
+ 252   2          }
+ 253   1          
+ 254   1          screen_write_val(addr_tab[ADDR_0E],value_0E);
+ 255   1          screen_write_val(addr_tab[ADDR_0B],value_0B);
+ 256   1      }
+ 257          
+ 258          
+ 259          void sun_dis(uint8_t on_off)
+ 260          {
+ 261   1          value_0E &= 0xf7;
+ 262   1          if(on_off==DIS_ON)
+ 263   1          {
+ 264   2              value_0E |= 0x08;   
+ 265   2          }
+ 266   1          screen_write_val(addr_tab[ADDR_0E],value_0E);
+ 267   1      }
+ 268          
+ 269          void sync_dis(uint8_t on_off)
+ 270          {
+ 271   1          value_03 &= 0xef;
+ 272   1          if(on_off==DIS_ON)
+ 273   1          {
+ 274   2              value_03 |= 0x10;   
+ 275   2          }
+ 276   1          screen_write_val(addr_tab[ADDR_03],value_03);
+ 277   1      }
+ 278          
+ 279          void alarm_dis(uint8_t on_off)
+ 280          {
+ 281   1          value_03 &= 0xdf;
+ 282   1          if(on_off==DIS_ON)
+ 283   1          {
+ 284   2              value_03 |= 0x20;   
+ 285   2          }
+ 286   1          screen_write_val(addr_tab[ADDR_03],value_03);
+ 287   1      }
+ 288          
+ 289          
+ 290          void Celsius_dis(uint8_t on_off)
+ 291          {
+ 292   1          value_03 &= 0xbf;
+ 293   1          if(on_off==DIS_ON)
+ 294   1          {
+ 295   2              value_03 |= 0x40;   
+ 296   2          }
+ 297   1          screen_write_val(addr_tab[ADDR_03],value_03);
+ 298   1      }
+ 299          
+ 300          void mode_dis(uint8_t on_off)
+ 301          {
+ 302   1          value_03 &= 0x7f;
+C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 6   
 
- 303          {
- 304   1          value_06 &= 0xf7;
- 305   1          if(on_off==DIS_ON)
- 306   1          {
- 307   2              value_06 |= 0x08;   
- 308   2          }
- 309   1          screen_write_val(addr_tab[ADDR_06],value_06);
- 310   1      }
- 311          
- 312          
- 313          void fan_center_dis(uint8_t on_off)
- 314          {
- 315   1          value_0F &= 0xdf;
- 316   1          if(on_off==DIS_ON)
- 317   1          {
- 318   2              value_0F |= 0x20;   
- 319   2          }
- 320   1          screen_write_val(addr_tab[ADDR_0F],value_0F);
- 321   1      }
- 322          
- 323          void fan_leaf1_dis(uint8_t on_off)
- 324          {
- 325   1          value_0E &= 0xef;
- 326   1          if(on_off==DIS_ON)
- 327   1          {
- 328   2              value_0E |= 0x10;   
- 329   2          }
- 330   1          screen_write_val(addr_tab[ADDR_0E],value_0E);
- 331   1      }
- 332          
- 333          void fan_leaf2_dis(uint8_t on_off)
- 334          {
- 335   1          value_0F &= 0xef;
- 336   1          if(on_off==DIS_ON)
- 337   1          {
- 338   2              value_0F |= 0x10;   
- 339   2          }
- 340   1          screen_write_val(addr_tab[ADDR_0F],value_0F);
- 341   1      }
- 342          
- 343          void fan_rotate()
- 344          {
- 345   1          fan_center_dis(DIS_ON);
- 346   1          if(( lcd_info.signal_in == 1) || (lcd_info.sync_flag == 0))
- 347   1          {
- 348   2              if( lcd_info.fan_level > 0 )
- 349   2              {
- 350   3                  fan_leaf1_dis(lcd_info.fan_rotate_flag);
- 351   3                  fan_leaf2_dis(1 - lcd_info.fan_rotate_flag);
- 352   3              }
- 353   2              sun_dis(DIS_ON);
- 354   2          }else
- 355   1          {
- 356   2              fan_leaf1_dis(DIS_ON);
- 357   2              fan_leaf2_dis(DIS_OFF);
- 358   2              sun_dis(DIS_OFF);
- 359   2          }
- 360   1      }
- 361          
- 362          void screen_all_dis( void )
- 363          {
- 364   1          num_dis(lcd_info.power_level);
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 16:55:13 PAGE 7   
+ 303   1          if(on_off==DIS_ON)
+ 304   1          {
+ 305   2              value_03 |= 0x80;   
+ 306   2          }
+ 307   1          screen_write_val(addr_tab[ADDR_03],value_03);
+ 308   1      }
+ 309          
+ 310          void percentage_dis(uint8_t on_off)
+ 311          {
+ 312   1          value_06 &= 0xf7;
+ 313   1          if(on_off==DIS_ON)
+ 314   1          {
+ 315   2              value_06 |= 0x08;   
+ 316   2          }
+ 317   1          screen_write_val(addr_tab[ADDR_06],value_06);
+ 318   1      }
+ 319          
+ 320          
+ 321          void fan_center_dis(uint8_t on_off)
+ 322          {
+ 323   1          value_0F &= 0xdf;
+ 324   1          if(on_off==DIS_ON)
+ 325   1          {
+ 326   2              value_0F |= 0x20;   
+ 327   2          }
+ 328   1          screen_write_val(addr_tab[ADDR_0F],value_0F);
+ 329   1      }
+ 330          
+ 331          void fan_leaf1_dis(uint8_t on_off)
+ 332          {
+ 333   1          value_0E &= 0xef;
+ 334   1          if(on_off==DIS_ON)
+ 335   1          {
+ 336   2              value_0E |= 0x10;   
+ 337   2          }
+ 338   1          screen_write_val(addr_tab[ADDR_0E],value_0E);
+ 339   1      }
+ 340          
+ 341          void fan_leaf2_dis(uint8_t on_off)
+ 342          {
+ 343   1          value_0F &= 0xef;
+ 344   1          if(on_off==DIS_ON)
+ 345   1          {
+ 346   2              value_0F |= 0x10;   
+ 347   2          }
+ 348   1          screen_write_val(addr_tab[ADDR_0F],value_0F);
+ 349   1      }
+ 350          
+ 351          void fan_rotate()
+ 352          {  
+ 353   1          if( lcd_info.alarm_set_flag == 0 )
+ 354   1          {   
+ 355   2              fan_center_dis(DIS_ON);
+ 356   2              if(( lcd_info.signal_in == 1) || (lcd_info.sync_flag == 0))
+ 357   2              {
+ 358   3                  if( lcd_info.fan_level > 0 )
+ 359   3                  {
+ 360   4                      fan_leaf1_dis(lcd_info.fan_rotate_flag);
+ 361   4                      fan_leaf2_dis(1 - lcd_info.fan_rotate_flag);
+ 362   4                  }
+ 363   3                  sun_dis(DIS_ON);
+ 364   3              }else
+C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 7   
 
- 365   1          wind_dis(lcd_info.fan_level);
- 366   1          channel_dis(lcd_info.channel_num);
- 367   1          sync_dis(lcd_info.sync_flag);
- 368   1          if( lcd_info.sync_flag == 1 )
- 369   1          {
- 370   2              sun_dis(DIS_OFF);
- 371   2          }else
- 372   1          {
- 373   2              sun_dis(DIS_ON);
- 374   2          }
- 375   1          percentage_dis(DIS_ON);
- 376   1      }
+ 365   2              {
+ 366   3                  fan_leaf1_dis(DIS_ON);
+ 367   3                  fan_leaf2_dis(DIS_OFF);
+ 368   3                  sun_dis(DIS_OFF);
+ 369   3              }
+ 370   2          }
+ 371   1      }
+ 372          
+ 373          void alarm_temp_flick( void )
+ 374          {
+ 375   1          static uint8_t now_val = 0;
+ 376   1          if( now_val != lcd_info.alarm_temp_flick_flag )
+ 377   1          {
+ 378   2              if( lcd_info.alarm_set_flag == 1 )
+ 379   2              {
+ 380   3                  if( lcd_info.alarm_temp_flick_flag == 1 )
+ 381   3                  {
+ 382   4                      num_dis(lcd_info.alarm_temp_val);
+ 383   4                      Celsius_dis(DIS_ON);
+ 384   4                  }else
+ 385   3                  {
+ 386   4                      screen_clear();
+ 387   4                      fan_leaf1_dis(DIS_OFF);
+ 388   4                      fan_leaf2_dis(DIS_OFF);
+ 389   4                      fan_center_dis(DIS_OFF);
+ 390   4                      Celsius_dis(DIS_ON);
+ 391   4                      sun_dis(DIS_OFF);
+ 392   4                      wind_dis(0);
+ 393   4                      channel_dis(0);
+ 394   4                  }
+ 395   3              } 
+ 396   2              now_val = lcd_info.alarm_temp_flick_flag;
+ 397   2          }
+ 398   1          
+ 399   1      }
+ 400          void screen_all_dis( void )
+ 401          {
+ 402   1          num_dis(lcd_info.power_level);
+ 403   1          wind_dis(lcd_info.fan_level);
+ 404   1          channel_dis(lcd_info.channel_num);
+ 405   1          sync_dis(lcd_info.sync_flag);
+ 406   1          if( lcd_info.sync_flag == 1 )
+ 407   1          {
+ 408   2              sun_dis(DIS_OFF);
+ 409   2          }else
+ 410   1          {
+ 411   2              sun_dis(DIS_ON);
+ 412   2          }
+ 413   1          percentage_dis(DIS_ON);
+ 414   1          Celsius_dis(DIS_OFF);
+ 415   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1167    ----
+   CODE SIZE        =   1279    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =     33       4
+   XDATA SIZE       =     37       4
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
    EDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 8   
+
    HDATA SIZE       =   ----    ----
    XDATA CONST SIZE =   ----    ----
    FAR CONST SIZE   =   ----    ----

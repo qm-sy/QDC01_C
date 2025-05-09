@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.7.0   DELAY                                                             05/09/2025 16:55:13 PAGE 1   
+C51 COMPILER V9.60.7.0   DELAY                                                             05/09/2025 22:57:57 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DELAY
 OBJECT MODULE PLACED IN .\Output\delay.obj
-COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE BSP\Src\delay.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP\Inc
-                    -;.\Core\Inc;.\Emembed\Inc) DEBUG PRINT(.\delay.lst) OBJECT(.\Output\delay.obj)
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE BSP\Src\delay.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP\
+                    -Inc;.\Core\Inc;.\Emembed\Inc) DEBUG PRINT(.\delay.lst) OBJECT(.\Output\delay.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    BIT SIZE         =   ----    ----
    EDATA SIZE       =   ----    ----
    HDATA SIZE       =   ----    ----
-C51 COMPILER V9.60.7.0   DELAY                                                             05/09/2025 16:55:13 PAGE 2   
+C51 COMPILER V9.60.7.0   DELAY                                                             05/09/2025 22:57:57 PAGE 2   
 
    XDATA CONST SIZE =   ----    ----
    FAR CONST SIZE   =   ----    ----

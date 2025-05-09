@@ -68,7 +68,7 @@ void Modbus_Event( void )
 void Modbus_Fun3( void )
 {
     uint16_t i;
-    
+    Buzzer = 0;
     modbus.send_value_addr  = 3;                //DATA1 H 位置
     modbus.byte_cnt   = (rs485.RX4_buf[4]<<8 | rs485.RX4_buf[5]) *2;
     modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
@@ -132,6 +132,7 @@ void Modbus_Fun3( void )
         rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_L;
     }
     slave_to_master(0x03,3 + modbus.byte_cnt);
+    Buzzer = 1;
 }
 
 /**
@@ -144,7 +145,6 @@ void Modbus_Fun3( void )
 void Modbus_Fun4( void )
 {
     uint16_t i;
-
     modbus.send_value_addr  = 3;                 //DATA1 H 位置
     modbus.byte_cnt   = (rs485.RX4_buf[4]<<8 | rs485.RX4_buf[5]) *2;
     modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
@@ -183,6 +183,7 @@ void Modbus_Fun4( void )
 **/
 void Modbus_Fun6( void )
 {
+    Buzzer = 0;
     switch (rs485.RX4_buf[3])
     {
         /*  40001  风速设置                 */
@@ -205,13 +206,15 @@ void Modbus_Fun6( void )
             
         /*  40004  同步状态设置                   */
         case 0x03:                                         
-
+            PWMB_BKR = 0x80;    //PWM控制
+            EX0 = 1;            //外部中断控制
 
             break;
 
         /*  40005  工作模式设置                   */
         case 0x04:                                         
-
+            PWMB_BKR = 0x00; 
+            EX0 = 0;
 
             break;
 
@@ -226,6 +229,8 @@ void Modbus_Fun6( void )
             break;   
     }
     slave_to_master(0x06,8);
+    delay_ms(20);
+    Buzzer = 1;
 }
 
 /**
@@ -238,7 +243,7 @@ void Modbus_Fun6( void )
 void Modbus_Fun16( void )
 {
     uint16_t i;
-
+    Buzzer = 0;
     modbus.rcv_value_addr = 7;                  //DATA1 H位置
     modbus.byte_cnt   = rs485.RX4_buf[6];
     modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
@@ -288,9 +293,7 @@ void Modbus_Fun16( void )
             /*  40006  模式设置                   */
             case 0x05:                                         
                 ac_dc.mode_num = modbus.byte_info_L;
-                Buzzer = 0;
-                delay_ms(20);
-                Buzzer = 1;
+
                 eeprom_mode_record();
                 
                 break;
@@ -304,6 +307,7 @@ void Modbus_Fun16( void )
     slave_to_master(0x10,8);
 
     eeprom_data_record();                      //记录更改后的值
+    Buzzer = 1;
 }
 
 

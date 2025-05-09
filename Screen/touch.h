@@ -21,9 +21,9 @@
 #define KEY6            5
 
 extern u16	xdata TK_cnt[6];	// ������ֵ
-extern u32	xdata TK_zero[6];	// 0�����? 
+extern u32	xdata TK_zero[6];	// 0�����? 
 extern u16 T_KeyCmp[6] ;
-extern bit	B_ReadKeyOk;	//��־��ת�����?16����
+extern bit	B_ReadKeyOk;	//��־��ת�����?16����
 extern u16 Count[6] ;
 extern u16 LastState ;						//8λ���� 	b0=1������k0��һ�ΰ��¹� 
 
@@ -40,13 +40,13 @@ typedef struct
 extern KEY_VAL key_val;
 
 void KEY_T_Init(void);
-void KEY_Deal(void)	;		//������еİ���״�? 10msִ��һ��
+void KEY_Deal(void)	;		//������еİ���״�? 10msִ��һ��
 u8 KEY_ReadState(u8 keynum);	//��ȡָ���İ�����״̬ 10msִ��һ��
 
 void key_scan( void );
 void channel_choose( void );
-void up_key( void );
-void down_key( void );
+void key_up( void );
+void key_down( void );
 void fan_up( void );
 void fan_down( void );
 void mode_choose( void );
