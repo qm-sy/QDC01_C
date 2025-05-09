@@ -38,6 +38,7 @@ void lcd_info_init( void )
     lcd_info.sync_flag = 0;
     lcd_info.mode_num  = 1;
 
+    lcd_info.fan_rotate_flag = 1;
     lcd_info.lcd_connect_flag = 0;
 }
 
@@ -68,6 +69,8 @@ void screen_clear( void ) //清显示缓存
     alarm_dis(0);
     Celsius_dis(0);
     sync_dis(0);
+    percentage_dis(0);
+    mode_dis(0);
     for(i = 0;i < 7;i++)
     {
         screen_write_val(addr_tab[i],0);
@@ -112,7 +115,7 @@ void num_dis(uint8_t num)
     value_0B &= 0x00;
     value_0A &= 0X00;
     value_07 &= 0X00;
-    value_06 &= 0X00;
+    value_06 &= 0X08;
     
     value_0B |= (num_tab[hundreds]>>4);
     value_0A |= num_tab[hundreds];
@@ -222,13 +225,13 @@ void channel_dis(uint8_t num)
             break;
         
         case 5:
-            value_0E |= 0x03;
-            value_0B |= 0x30;
+            value_0E |= 0x05;
+            value_0B |= 0x50;
             break;
         
         case 6:
-            value_0E |= 0x05;
-            value_0B |= 0x50;
+            value_0E |= 0x03;
+            value_0B |= 0x30;
             break;
         
         case 7:
@@ -245,7 +248,7 @@ void channel_dis(uint8_t num)
 }
 
 
-void sun_dis(bit on_off)
+void sun_dis(uint8_t on_off)
 {
     value_0E &= 0xf7;
     if(on_off==DIS_ON)
@@ -255,7 +258,7 @@ void sun_dis(bit on_off)
     screen_write_val(addr_tab[ADDR_0E],value_0E);
 }
 
-void sync_dis(bit on_off)
+void sync_dis(uint8_t on_off)
 {
     value_03 &= 0xef;
     if(on_off==DIS_ON)
@@ -265,7 +268,7 @@ void sync_dis(bit on_off)
     screen_write_val(addr_tab[ADDR_03],value_03);
 }
 
-void alarm_dis(bit on_off)
+void alarm_dis(uint8_t on_off)
 {
     value_03 &= 0xdf;
     if(on_off==DIS_ON)
@@ -276,7 +279,7 @@ void alarm_dis(bit on_off)
 }
 
 
-void Celsius_dis(bit on_off)
+void Celsius_dis(uint8_t on_off)
 {
     value_03 &= 0xbf;
     if(on_off==DIS_ON)
@@ -286,7 +289,7 @@ void Celsius_dis(bit on_off)
     screen_write_val(addr_tab[ADDR_03],value_03);
 }
 
-void mode_dis(bit on_off)
+void mode_dis(uint8_t on_off)
 {
     value_03 &= 0x7f;
     if(on_off==DIS_ON)
@@ -296,7 +299,7 @@ void mode_dis(bit on_off)
     screen_write_val(addr_tab[ADDR_03],value_03);
 }
 
-void percentage_dis(bit on_off)
+void percentage_dis(uint8_t on_off)
 {
     value_06 &= 0xf7;
     if(on_off==DIS_ON)
@@ -307,7 +310,7 @@ void percentage_dis(bit on_off)
 }
 
 
-void fan_center_dis(bit on_off)
+void fan_center_dis(uint8_t on_off)
 {
     value_0F &= 0xdf;
     if(on_off==DIS_ON)
@@ -317,7 +320,7 @@ void fan_center_dis(bit on_off)
     screen_write_val(addr_tab[ADDR_0F],value_0F);
 }
 
-void fan_leaf1_dis(bit on_off)
+void fan_leaf1_dis(uint8_t on_off)
 {
     value_0E &= 0xef;
     if(on_off==DIS_ON)
@@ -327,7 +330,7 @@ void fan_leaf1_dis(bit on_off)
     screen_write_val(addr_tab[ADDR_0E],value_0E);
 }
 
-void fan_leaf2_dis(bit on_off)
+void fan_leaf2_dis(uint8_t on_off)
 {
     value_0F &= 0xef;
     if(on_off==DIS_ON)
@@ -337,18 +340,37 @@ void fan_leaf2_dis(bit on_off)
     screen_write_val(addr_tab[ADDR_0F],value_0F);
 }
 
+void fan_rotate()
+{
+    fan_center_dis(DIS_ON);
+    if(( lcd_info.signal_in == 1) || (lcd_info.sync_flag == 0))
+    {
+        if( lcd_info.fan_level > 0 )
+        {
+            fan_leaf1_dis(lcd_info.fan_rotate_flag);
+            fan_leaf2_dis(1 - lcd_info.fan_rotate_flag);
+        }
+        sun_dis(DIS_ON);
+    }else
+    {
+        fan_leaf1_dis(DIS_ON);
+        fan_leaf2_dis(DIS_OFF);
+        sun_dis(DIS_OFF);
+    }
+}
+
 void screen_all_dis( void )
 {
     num_dis(lcd_info.power_level);
     wind_dis(lcd_info.fan_level);
     channel_dis(lcd_info.channel_num);
     sync_dis(lcd_info.sync_flag);
-    sun_dis(DIS_ON);
-    alarm_dis(DIS_ON);
-    Celsius_dis(DIS_ON);
-    mode_dis(DIS_ON);
+    if( lcd_info.sync_flag == 1 )
+    {
+        sun_dis(DIS_OFF);
+    }else
+    {
+        sun_dis(DIS_ON);
+    }
     percentage_dis(DIS_ON);
-    fan_center_dis(DIS_ON);
-    fan_leaf1_dis(DIS_ON);
-    fan_leaf2_dis(DIS_ON);
 }

@@ -32,12 +32,12 @@ void main(void)
 	screen_init();
 	while ( lcd_info.lcd_connect_flag == 0 )
 	{
-		get_slave_statu_03();
+		get_slave_params_03();
 		Modbus_Event();
 		delay_ms(50);
 	}
-	
 
+	screen_clear();
 	screen_all_dis();
 
 	KEY_T_Init(); 	
@@ -48,6 +48,8 @@ void main(void)
     {
 		Modbus_Event();
 		key_scan();
+		fan_rotate();
+		get_slave_status();
 		delay_ms(10);
 	}
 

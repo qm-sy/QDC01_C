@@ -68,7 +68,7 @@ void Modbus_Event( void )
 void Modbus_Fun3( void )
 {
     uint16_t i;
-
+    
     modbus.send_value_addr  = 3;                //DATA1 H 位置
     modbus.byte_cnt   = (rs485.RX4_buf[4]<<8 | rs485.RX4_buf[5]) *2;
     modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
@@ -119,7 +119,7 @@ void Modbus_Fun3( void )
                 break;
 
             /*  40006 报警温度查询                     */
-            case 5:   
+            case 0x05:   
                 modbus.byte_info_H = 0;
                 modbus.byte_info_L = ac_dc.mode_num;
 
@@ -159,6 +159,12 @@ void Modbus_Fun4( void )
         modbus.byte_info_H = modbus.byte_info_L = 0X00;
         switch (i)
         {
+            case 0:
+                modbus.byte_info_H = 0x00;
+                modbus.byte_info_L = ac_dc.signal_in_flag;
+
+                break;
+
             default:
                 break;
         }
@@ -211,17 +217,15 @@ void Modbus_Fun6( void )
 
         /*  40006  报警温度设置                   */
         case 0x05:                                         
-
-            
+            ac_dc.mode_num = rs485.RX4_buf[5];
+            eeprom_mode_record();
+            eeprom_data_init();
             break;
 
         default:
             break;   
     }
-
     slave_to_master(0x06,8);
-
-    eeprom_data_record();
 }
 
 /**
@@ -240,7 +244,7 @@ void Modbus_Fun16( void )
     modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
 
     
-    for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++)
+    for( i = modbus.start_addr; i < (modbus.start_addr + modbus.byte_cnt/2); i++)
     {
         modbus.byte_info_H = rs485.RX4_buf[modbus.rcv_value_addr];
         modbus.byte_info_L = rs485.RX4_buf[modbus.rcv_value_addr + 1];
@@ -249,6 +253,7 @@ void Modbus_Fun16( void )
             /*  40001  通道设置                 */
             case 0x00:
                 ac_dc.channel_num = modbus.byte_info_L;
+                channel_close();
 
                 break;
             
@@ -283,6 +288,9 @@ void Modbus_Fun16( void )
             /*  40006  模式设置                   */
             case 0x05:                                         
                 ac_dc.mode_num = modbus.byte_info_L;
+                Buzzer = 0;
+                delay_ms(20);
+                Buzzer = 1;
                 eeprom_mode_record();
                 
                 break;

@@ -50,8 +50,10 @@ void Tim1_ISR( void ) interrupt 3   //10ms
         ac_dc.zero_flag = 0;
 
          /* 2, 温度允许，使能为1时可开启输出          */
-        AC_Out1 = AC_Out2 = AC_Out3 = 0;
-        
+        AC_Out1 = 1 - ac_dc.ac_out1_flag;
+        AC_Out2 = 1 - ac_dc.ac_out2_flag;
+        AC_Out3 = 1 - ac_dc.ac_out3_flag;
+
          /* 3, 设置下一次Timer1中断触发所需时间，即脉冲时间       */
         TL1 = 0xF7;				
         TH1 = 0xFF;				
@@ -75,7 +77,7 @@ void Tim1_ISR( void ) interrupt 3   //10ms
 **/
 void ac_220v_crl( uint8_t power_level )
 {
-    ac_dc.time_delay = 56500 + 90*power_level;
+    ac_dc.time_delay = 58000 + 74*power_level;
 }
 
 
@@ -145,3 +147,45 @@ void temp_scan( void )
     }
 }
 
+void channel_close( void )
+{
+    switch (ac_dc.channel_num)
+    {
+        case 1:
+        ac_dc.ac_out1_flag = 1;
+        ac_dc.ac_out2_flag = ac_dc.ac_out3_flag = 0;
+        break;
+
+        case 2:
+        ac_dc.ac_out2_flag = 1;
+        ac_dc.ac_out1_flag = ac_dc.ac_out3_flag = 0;
+        break;
+
+        case 3:
+        ac_dc.ac_out3_flag = 1;
+        ac_dc.ac_out1_flag = ac_dc.ac_out2_flag = 0;
+        break;
+
+        case 4:
+        ac_dc.ac_out1_flag = ac_dc.ac_out2_flag = 1;
+        ac_dc.ac_out3_flag = 0;
+        break;
+
+        case 5:
+        ac_dc.ac_out1_flag = ac_dc.ac_out3_flag = 1;
+        ac_dc.ac_out2_flag = 0;
+        break;
+
+        case 6:
+        ac_dc.ac_out2_flag = ac_dc.ac_out3_flag = 1;
+        ac_dc.ac_out1_flag = 0;
+        break;
+
+        case 7:
+        ac_dc.ac_out1_flag = ac_dc.ac_out2_flag = ac_dc.ac_out3_flag = 1;
+        break;
+
+    default:
+        break;
+    }
+}

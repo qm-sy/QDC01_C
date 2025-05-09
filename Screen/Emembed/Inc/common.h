@@ -4,5 +4,6 @@
 #include "stc.h"
 #include "communication.h"
 #include "touch.h"
+#include "tm1722.h"
 
 #endif

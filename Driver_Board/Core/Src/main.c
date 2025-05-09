@@ -38,6 +38,7 @@ void main( void )
     {
         Modbus_Event();
         temp_scan();
+        sync_ctrl();
  
     }  
 }

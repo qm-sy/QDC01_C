@@ -16,6 +16,7 @@ typedef struct
     uint8_t  send_value_addr;            //DATA1 H 位置
     uint8_t  rcv_value_addr;             //DATA1 H 位置
     uint16_t start_addr;                 //查询起始位置
+    uint8_t scan_flag_04;
 }MODBIS_INFO;
 
 
@@ -30,7 +31,10 @@ void Modbus_Fun16( void );
 
 void slave_to_master(uint8_t code_num,uint8_t length);
 uint16_t MODBUS_CRC16(uint8_t *buf, uint8_t length);
-void send_to_slave( void );
-void get_slave_statu_03( void );
+void send_to_slave_16( void );
+void get_slave_params_03( void );
+void send_to_slave_06( void );
+void get_slave_statu_04( void );
+void get_slave_status( void );
 
 #endif

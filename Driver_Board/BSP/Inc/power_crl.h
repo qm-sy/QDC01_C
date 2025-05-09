@@ -23,6 +23,10 @@ typedef struct
     uint8_t  mode_num;             //模式选择
 
     uint8_t signal_in_flag;         //24V输入检测
+
+    uint8_t ac_out1_flag;
+    uint8_t ac_out2_flag;
+    uint8_t ac_out3_flag;
 }AC_DC;
 
 extern AC_DC ac_dc;
@@ -34,5 +38,6 @@ void sync_ctrl( void );
 void temp_scan( void );
 void fan_ctrl( uint8_t level );
 void mode_ctrl( uint8_t mode_num );
+void channel_close( void );
 
 #endif

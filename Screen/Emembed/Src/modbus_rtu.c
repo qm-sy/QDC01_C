@@ -35,9 +35,10 @@ void Modbus_Event( void )
                 switch ( rs485.RX4_buf[1] )
                 {
                     case 0x03:		Modbus_Fun3();		break;
-                    case 0x04:		Modbus_Fun4();      break;    
+                    case 0x04:		Modbus_Fun4();		break;
+                    case 0x06:		Modbus_Fun6();      break;    
 
-                    case 0x10:      Modbus_Fun4();      break;  
+                    case 0x10:                          break;  
                     default:                            break;
                 }
             }
@@ -89,15 +90,34 @@ void Modbus_Fun3()
         start_addr_03 += 2;
     }
     lcd_info.lcd_connect_flag = 1;
-    num_dis(lcd_info.power_level);
-    wind_dis(lcd_info.fan_level);
-    channel_dis(lcd_info.channel_num);
-    sync_dis(lcd_info.sync_flag);
+    screen_all_dis();
 }
+
 
 void Modbus_Fun4()
 {
+    uint8_t start_addr_04 = 3;              //Slave reply  DATA1_H address
+    uint16_t i;
+    for( i = 0; i < 1; i++)
+    {
+        switch (i)
+        {
+         case 0:
+            lcd_info.signal_in = rs485.RX4_buf[start_addr_04 + 1];
 
+            break;
+ 
+         default:
+             break;
+        }
+        start_addr_04 += 2;
+    }
+}
+
+
+void Modbus_Fun6()
+{
+    get_slave_params_03();
 }
 
 
@@ -203,7 +223,7 @@ uint16_t MODBUS_CRC16(uint8_t *buf, uint8_t length)
 	return	(crc16);
 }
 
-void get_slave_statu_03( void )
+void get_slave_params_03( void )
 {
     uint8_t send_buf[8] = {0xDC,0x03,0x00,0x00,0x00,0x06,0x45,0xD7};
 
@@ -216,9 +236,47 @@ void get_slave_statu_03( void )
     delay_ms(1);
 }
 
-void send_to_slave( void )
+void get_slave_statu_04( void )
 {
-   uint8_t send_buf[21];
+    uint8_t send_buf[8] = {0xDC,0x04,0x00,0x00,0x00,0x01,0x47,0x23};
+
+    memcpy(rs485.TX4_buf,send_buf,8);
+    rs485.TX4_send_bytelength = 8;
+
+    DR_485 = 1;                                 //485可以发送
+    delay_ms(2);
+    S4CON |= S4TI;                              //开始发送
+    delay_ms(1);
+}
+
+void send_to_slave_06( void )
+{
+    uint8_t send_buf[8];
+    uint16_t crc;
+
+    send_buf[0] = 0xDC;
+    send_buf[1] = 0x06;
+    send_buf[2] = 0x00;
+    send_buf[3] = 0x05;
+    send_buf[4] = 0x00;
+    send_buf[5] = lcd_info.mode_num;
+   
+    crc = MODBUS_CRC16(send_buf,6);
+    send_buf[6] = crc>>8;
+    send_buf[7] = crc;
+
+    memcpy(rs485.TX4_buf,send_buf,8);
+   
+    rs485.TX4_send_bytelength = 8;
+    DR_485 = 1;                                 //485可以发送
+    delay_ms(2);
+    S4CON |= S4TI;                              //开始发送
+    delay_ms(1);
+}
+
+void send_to_slave_16( void )
+{
+   uint8_t send_buf[19];
    uint16_t crc;
 
    send_buf[0] = 0xDC;
@@ -226,8 +284,8 @@ void send_to_slave( void )
    send_buf[2] = 0x00;
    send_buf[3] = 0x00;
    send_buf[4] = 0x00;
-   send_buf[5] = 0x06;
-   send_buf[6] = 0x0C;
+   send_buf[5] = 0x05;
+   send_buf[6] = 0x0A;
 
    send_buf[7] = 0x00;
    send_buf[8] = lcd_info.channel_num;
@@ -244,20 +302,25 @@ void send_to_slave( void )
    send_buf[15] = 0x00;
    send_buf[16] = lcd_info.alarm_temp_val;
 
-   send_buf[17] = 0x00;
-   send_buf[18] = lcd_info.mode_num;
+   crc = MODBUS_CRC16(send_buf,17);
 
-   crc = MODBUS_CRC16(send_buf,19);
+   send_buf[17] = crc>>8;
+   send_buf[18] = crc;
 
-   send_buf[19] = crc>>8;
-   send_buf[20] = crc;
-
-   memcpy(rs485.TX4_buf,send_buf,21);
+   memcpy(rs485.TX4_buf,send_buf,19);
    
-   rs485.TX4_send_bytelength = 21;
+   rs485.TX4_send_bytelength = 19;
    DR_485 = 1;                                 //485可以发送
    delay_ms(2);
    S4CON |= S4TI;                              //开始发送
    delay_ms(1);
 }
 
+void get_slave_status( void )
+{
+    if( modbus.scan_flag_04 == 1)
+    {
+        get_slave_statu_04();
+        modbus.scan_flag_04 = 0;
+    }
+}

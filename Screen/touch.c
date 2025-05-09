@@ -162,7 +162,6 @@ u8 KEY_ReadState(u8 keynum)	//读取指定的按键的状态 10ms执行一次
 		{
 			return KEY_LONGOVER;
 		}			
-		
 	}
 	else									//按键已经松开了，返回各种状态
 	{
@@ -185,67 +184,61 @@ void key_val_init( void )
     key_val.key4_scan_allow = 1;   
     key_val.key5_scan_allow = 1;   
     key_val.key6_scan_allow = 1; 
-	key_val.key_sacn_flag   = 1;
 }
 void key_scan( void )
 {
-	if( key_val.key_sacn_flag == 1 )
+	KEY_Deal();	
+	if( KEY_ReadState(KEY4) == KEY_PRESS )											//调节通道
 	{
-		KEY_Deal();	
-		if( KEY_ReadState(KEY4) == KEY_PRESS )											//调节通道
-		{
-			channel_choose();
-			send_to_slave();
-		}
-		if(( KEY_ReadState(KEY2) == KEY_PRESS ) && ( key_val.key2_scan_allow == 1 ))	//调节功率↑
-		{
-			up_key();
-			send_to_slave();
-		}
-		if(( KEY_ReadState(KEY3) == KEY_PRESS ) && ( key_val.key3_scan_allow == 1 ))	//调节功率↓
-		{
-			down_key();
-			send_to_slave();
-		}
-		if(( KEY_ReadState(KEY5) == KEY_PRESS ) && ( key_val.key5_scan_allow == 1 ))
-		{
-			mode_choose();
-			get_slave_statu_03();
-		}
+		channel_choose();
+		send_to_slave_16();
+	}
+	if(( KEY_ReadState(KEY2) == KEY_PRESS ) && ( key_val.key2_scan_allow == 1 ))	//调节功率↑
+	{
+		up_key();
+		send_to_slave_16();
+	}
+	if(( KEY_ReadState(KEY3) == KEY_PRESS ) && ( key_val.key3_scan_allow == 1 ))	//调节功率↓
+	{
+		down_key();
+		send_to_slave_16();
+	}
+	if(( KEY_ReadState(KEY5) == KEY_PRESS ) && ( key_val.key5_scan_allow == 1 ))
+	{
+		mode_choose();
+		send_to_slave_06();
+	}
 
-		if( KEY_ReadState(KEY6) == KEY_LONGOVER )										//调节风力
-		{
-			key_val.key2_scan_allow = 0;
-			key_val.key3_scan_allow = 0;
-			key_val.key5_scan_allow = 0;
+	if( KEY_ReadState(KEY6) == KEY_LONGOVER )										//调节风力
+	{
+		key_val.key2_scan_allow = 0;
+		key_val.key3_scan_allow = 0;
+		key_val.key5_scan_allow = 0;
 
-			if( KEY_ReadState(KEY2) == KEY_PRESS )
-			{
-				fan_up();
-				send_to_slave();
-			}
-			if( KEY_ReadState(KEY3) == KEY_PRESS )
-			{
-				fan_down();
-				send_to_slave();
-			}
-			if( KEY_ReadState(KEY5) == KEY_PRESS )
-			{
-				lcd_info.sync_flag = 1 - lcd_info.sync_flag;
-				sync_dis(lcd_info.sync_flag);
-				send_to_slave();
-			}
-		}
-		if( KEY_ReadState(KEY6) == KEY_NOPRESS )//释放按键2、3
+		if( KEY_ReadState(KEY2) == KEY_PRESS )
 		{
-			key_val.key2_scan_allow = 1;
-			key_val.key3_scan_allow = 1;
-			key_val.key5_scan_allow = 1;
+			fan_up();
+			send_to_slave_16();
 		}
-		//key_val.key_sacn_flag = 0;
-	}	
+		if( KEY_ReadState(KEY3) == KEY_PRESS )
+		{
+			fan_down();
+			send_to_slave_16();
+		}
+		if( KEY_ReadState(KEY5) == KEY_PRESS )
+		{
+			lcd_info.sync_flag = 1 - lcd_info.sync_flag;
+			sync_dis(lcd_info.sync_flag);
+			send_to_slave_16();
+		}
+	}
+	if( KEY_ReadState(KEY6) == KEY_NOPRESS )//释放按键2、3
+	{
+		key_val.key2_scan_allow = 1;
+		key_val.key3_scan_allow = 1;
+		key_val.key5_scan_allow = 1;
+	}
 }
-
 
 void channel_choose( void )
 {
@@ -273,7 +266,7 @@ void up_key( void )
 void down_key( void )
 {
 
-    if( lcd_info.power_level > 0)
+    if( lcd_info.power_level > 5)
     {
         lcd_info.power_level -= 5;
     }
@@ -327,7 +320,7 @@ void mode_choose( void )
 
     sync_dis(lcd_info.sync_flag);
     num_dis(lcd_info.power_level);
-    channel_dis(3);
-    percentage_dis(DIS_ON);
-    wind_dis(lcd_info.fan_level);         
+    channel_dis(lcd_info.channel_num);
+    wind_dis(lcd_info.fan_level);       
+	percentage_dis(DIS_ON);  
 }

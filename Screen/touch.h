@@ -1,11 +1,11 @@
 #ifndef __TOUCH_H
 #define __TOUCH_H
 
-#include "stc.h"   //������ͷ�ļ��󣬲���Ҫ�ٰ���"reg51.h"ͷ�ļ�
+#include "stc.h"   
 #include "delay.h"
 #include "tm1722.h"
 
-#define	KEY_NOPRESS		0		//����δ����
+#define	KEY_NOPRESS		0		
 #define	KEY_FILCKER		1		//����
 #define	KEY_PRESS		2		//����
 #define	KEY_PRESSOVER	3		//��������
@@ -21,9 +21,9 @@
 #define KEY6            5
 
 extern u16	xdata TK_cnt[6];	// ������ֵ
-extern u32	xdata TK_zero[6];	// 0����� 
+extern u32	xdata TK_zero[6];	// 0�����? 
 extern u16 T_KeyCmp[6] ;
-extern bit	B_ReadKeyOk;	//��־��ת�����16����
+extern bit	B_ReadKeyOk;	//��־��ת�����?16����
 extern u16 Count[6] ;
 extern u16 LastState ;						//8λ���� 	b0=1������k0��һ�ΰ��¹� 
 
@@ -35,13 +35,12 @@ typedef struct
     uint8_t  key4_scan_allow;   
     uint8_t  key5_scan_allow;   
     uint8_t  key6_scan_allow;   
-    uint8_t  key_sacn_flag;
 }KEY_VAL;
 
 extern KEY_VAL key_val;
 
 void KEY_T_Init(void);
-void KEY_Deal(void)	;		//������еİ���״̬ 10msִ��һ��
+void KEY_Deal(void)	;		//������еİ���״�? 10msִ��һ��
 u8 KEY_ReadState(u8 keynum);	//��ȡָ���İ�����״̬ 10msִ��һ��
 
 void key_scan( void );

@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.7.0   MAIN                                                              05/09/2025 01:35:29 PAGE 1   
+C51 COMPILER V9.60.7.0   MAIN                                                              05/09/2025 16:55:12 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
 OBJECT MODULE PLACED IN .\Output\main.obj
-COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE main.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP\Inc;.\Cor
-                    -e\Inc;.\Emembed\Inc) DEBUG OBJECT(.\Output\main.obj)
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE main.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP\Inc;.\Core\I
+                    -nc;.\Emembed\Inc) DEBUG OBJECT(.\Output\main.obj)
 
 line level    source
 
@@ -42,12 +42,12 @@ line level    source
   32   1              screen_init();
   33   1              while ( lcd_info.lcd_connect_flag == 0 )
   34   1              {
-  35   2                      get_slave_statu_03();
+  35   2                      get_slave_params_03();
   36   2                      Modbus_Event();
   37   2                      delay_ms(50);
   38   2              }
-  39   1              
-  40   1      
+  39   1      
+  40   1              screen_clear();
   41   1              screen_all_dis();
   42   1      
   43   1              KEY_T_Init();   
@@ -58,50 +58,52 @@ line level    source
   48   1          {
   49   2                      Modbus_Event();
   50   2                      key_scan();
-  51   2                      delay_ms(10);
-  52   2              }
-  53   1      
-  54   1      
-C51 COMPILER V9.60.7.0   MAIN                                                              05/09/2025 01:35:29 PAGE 2   
+  51   2                      fan_rotate();
+  52   2                      get_slave_status();
+  53   2                      delay_ms(10);
+  54   2              }
+C51 COMPILER V9.60.7.0   MAIN                                                              05/09/2025 16:55:12 PAGE 2   
 
-  55   1      }
-  56          
-  57          
-  58          //========================================================================
-  59          // 函数: void TKSU_Interrupt(void)
-  60          // 描述: 触摸按键中断。
-  61          // 参数: none.
-  62          // 返回: none.
-  63          // 版本: VER1.0
-  64          // 日期: 2021-02-01
-  65          // 备注: 
-  66          //========================================================================
-  67          void TKSU_Interrupt(void) interrupt 13
-  68          {
-  69   1              u8      j;
-  70   1              j = TSSTA2;
-  71   1              if(j & 0x40)    //数据溢出, 错误处理(略)
-  72   1              {
-  73   2                      TSSTA2 |= 0x40; //写1清零
-  74   2              }
-  75   1              if(j & 0x80)    //扫描完成
-  76   1              {
-  77   2                      j &= 0x0f;
-  78   2                      TSSTA2 |= 0x80; //写1清零
-  79   2                      TK_cnt[j] = TSDAT;      //保存某个通道的读数
-  80   2                      if( j==5 )
-  81   2                              B_ReadKeyOk=1;
-  82   2              }
-  83   1          
-  84   1      //    if( intf )
-  85   1      //    {
-  86   1      //        P0INTF=0;
-  87   1      //    }    
-  88   1      }
+  55   1      
+  56   1      
+  57   1      }
+  58          
+  59          
+  60          //========================================================================
+  61          // 函数: void TKSU_Interrupt(void)
+  62          // 描述: 触摸按键中断。
+  63          // 参数: none.
+  64          // 返回: none.
+  65          // 版本: VER1.0
+  66          // 日期: 2021-02-01
+  67          // 备注: 
+  68          //========================================================================
+  69          void TKSU_Interrupt(void) interrupt 13
+  70          {
+  71   1              u8      j;
+  72   1              j = TSSTA2;
+  73   1              if(j & 0x40)    //数据溢出, 错误处理(略)
+  74   1              {
+  75   2                      TSSTA2 |= 0x40; //写1清零
+  76   2              }
+  77   1              if(j & 0x80)    //扫描完成
+  78   1              {
+  79   2                      j &= 0x0f;
+  80   2                      TSSTA2 |= 0x80; //写1清零
+  81   2                      TK_cnt[j] = TSDAT;      //保存某个通道的读数
+  82   2                      if( j==5 )
+  83   2                              B_ReadKeyOk=1;
+  84   2              }
+  85   1          
+  86   1      //    if( intf )
+  87   1      //    {
+  88   1      //        P0INTF=0;
+  89   1      //    }    
+  90   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    182    ----
+   CODE SIZE        =    191    ----
    CONSTANT SIZE    =     28    ----
    XDATA SIZE       =      1       1
    PDATA SIZE       =   ----    ----

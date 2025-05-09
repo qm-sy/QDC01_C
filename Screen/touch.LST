@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 01:35:28 PAGE 1   
+C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 16:55:12 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE TOUCH
 OBJECT MODULE PLACED IN .\Output\touch.obj
-COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE touch.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP\Inc;.\Co
-                    -re\Inc;.\Emembed\Inc) DEBUG OBJECT(.\Output\touch.obj)
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE touch.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP\Inc;.\Core\
+                    -Inc;.\Emembed\Inc) DEBUG OBJECT(.\Output\touch.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   50   1          for(i=0;i<6;i++)
   51   1          {
   52   2              TK_zero[i]=(TK_zero[i]>>3);
-C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 01:35:28 PAGE 2   
+C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 16:55:12 PAGE 2   
 
   53   2      //        printf("%u\t",(u16)TK_zero[i]);
   54   2              T_KeyCmp[i] = 1500;
@@ -126,7 +126,7 @@ line level    source
  112   4                                      else
  113   4                                      {
  114   5                                              LastState &= ~(1<<i);   //这个变量相应的标志位清0
-C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 01:35:28 PAGE 3   
+C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 16:55:12 PAGE 3   
 
  115   5                                      }
  116   4                                      Count[i] = 0;                           //按键按下，这个计数变量清0
@@ -178,187 +178,180 @@ line level    source
  162   2                      {
  163   3                              return KEY_LONGOVER;
  164   3                      }                       
- 165   2                      
- 166   2              }
- 167   1              else                                                                    //按键已经松开了，返回各种状态
- 168   1              {
- 169   2                      if( LastState &( 1<<keynum ) )          //按键之前按下过
- 170   2                      {
- 171   3                              return KEY_RELAX;               
- 172   3                      }
- 173   2                      else                                                            //按键之前没有按下
- 174   2                      {
- 175   3                              return KEY_NOPRESS;
- 176   3                      }
-C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 01:35:28 PAGE 4   
+ 165   2              }
+ 166   1              else                                                                    //按键已经松开了，返回各种状态
+ 167   1              {
+ 168   2                      if( LastState &( 1<<keynum ) )          //按键之前按下过
+ 169   2                      {
+ 170   3                              return KEY_RELAX;               
+ 171   3                      }
+ 172   2                      else                                                            //按键之前没有按下
+ 173   2                      {
+ 174   3                              return KEY_NOPRESS;
+ 175   3                      }
+ 176   2              }
+C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 16:55:12 PAGE 4   
 
- 177   2              }
- 178   1      }
- 179          
- 180          void key_val_init( void )
- 181          {
- 182   1              key_val.key1_scan_allow = 1;       
- 183   1          key_val.key2_scan_allow = 1;  
- 184   1          key_val.key3_scan_allow = 1;   
- 185   1          key_val.key4_scan_allow = 1;   
- 186   1          key_val.key5_scan_allow = 1;   
- 187   1          key_val.key6_scan_allow = 1; 
- 188   1              key_val.key_sacn_flag   = 1;
- 189   1      }
- 190          void key_scan( void )
- 191          {
- 192   1              if( key_val.key_sacn_flag == 1 )
- 193   1              {
- 194   2                      KEY_Deal();     
- 195   2                      if( KEY_ReadState(KEY4) == KEY_PRESS )                                                                                  //调节通道
- 196   2                      {
- 197   3                              channel_choose();
- 198   3                              send_to_slave();
- 199   3                      }
- 200   2                      if(( KEY_ReadState(KEY2) == KEY_PRESS ) && ( key_val.key2_scan_allow == 1 ))    //调节功率↑
- 201   2                      {
- 202   3                              up_key();
- 203   3                              send_to_slave();
- 204   3                      }
- 205   2                      if(( KEY_ReadState(KEY3) == KEY_PRESS ) && ( key_val.key3_scan_allow == 1 ))    //调节功率↓
- 206   2                      {
- 207   3                              down_key();
- 208   3                              send_to_slave();
- 209   3                      }
- 210   2                      if(( KEY_ReadState(KEY5) == KEY_PRESS ) && ( key_val.key5_scan_allow == 1 ))
- 211   2                      {
- 212   3                              mode_choose();
- 213   3                              get_slave_statu_03();
- 214   3                      }
- 215   2      
- 216   2                      if( KEY_ReadState(KEY6) == KEY_LONGOVER )                                                                               //调节风力
- 217   2                      {
- 218   3                              key_val.key2_scan_allow = 0;
- 219   3                              key_val.key3_scan_allow = 0;
- 220   3                              key_val.key5_scan_allow = 0;
- 221   3      
- 222   3                              if( KEY_ReadState(KEY2) == KEY_PRESS )
- 223   3                              {
- 224   4                                      fan_up();
- 225   4                                      send_to_slave();
- 226   4                              }
- 227   3                              if( KEY_ReadState(KEY3) == KEY_PRESS )
- 228   3                              {
- 229   4                                      fan_down();
- 230   4                                      send_to_slave();
- 231   4                              }
- 232   3                              if( KEY_ReadState(KEY5) == KEY_PRESS )
- 233   3                              {
- 234   4                                      lcd_info.sync_flag = 1 - lcd_info.sync_flag;
- 235   4                                      sync_dis(lcd_info.sync_flag);
- 236   4                                      send_to_slave();
- 237   4                              }
- 238   3                      }
-C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 01:35:28 PAGE 5   
+ 177   1      }
+ 178          
+ 179          void key_val_init( void )
+ 180          {
+ 181   1              key_val.key1_scan_allow = 1;       
+ 182   1          key_val.key2_scan_allow = 1;  
+ 183   1          key_val.key3_scan_allow = 1;   
+ 184   1          key_val.key4_scan_allow = 1;   
+ 185   1          key_val.key5_scan_allow = 1;   
+ 186   1          key_val.key6_scan_allow = 1; 
+ 187   1      }
+ 188          void key_scan( void )
+ 189          {
+ 190   1              KEY_Deal();     
+ 191   1              if( KEY_ReadState(KEY4) == KEY_PRESS )                                                                                  //调节通道
+ 192   1              {
+ 193   2                      channel_choose();
+ 194   2                      send_to_slave_16();
+ 195   2              }
+ 196   1              if(( KEY_ReadState(KEY2) == KEY_PRESS ) && ( key_val.key2_scan_allow == 1 ))    //调节功率↑
+ 197   1              {
+ 198   2                      up_key();
+ 199   2                      send_to_slave_16();
+ 200   2              }
+ 201   1              if(( KEY_ReadState(KEY3) == KEY_PRESS ) && ( key_val.key3_scan_allow == 1 ))    //调节功率↓
+ 202   1              {
+ 203   2                      down_key();
+ 204   2                      send_to_slave_16();
+ 205   2              }
+ 206   1              if(( KEY_ReadState(KEY5) == KEY_PRESS ) && ( key_val.key5_scan_allow == 1 ))
+ 207   1              {
+ 208   2                      mode_choose();
+ 209   2                      send_to_slave_06();
+ 210   2              }
+ 211   1      
+ 212   1              if( KEY_ReadState(KEY6) == KEY_LONGOVER )                                                                               //调节风力
+ 213   1              {
+ 214   2                      key_val.key2_scan_allow = 0;
+ 215   2                      key_val.key3_scan_allow = 0;
+ 216   2                      key_val.key5_scan_allow = 0;
+ 217   2      
+ 218   2                      if( KEY_ReadState(KEY2) == KEY_PRESS )
+ 219   2                      {
+ 220   3                              fan_up();
+ 221   3                              send_to_slave_16();
+ 222   3                      }
+ 223   2                      if( KEY_ReadState(KEY3) == KEY_PRESS )
+ 224   2                      {
+ 225   3                              fan_down();
+ 226   3                              send_to_slave_16();
+ 227   3                      }
+ 228   2                      if( KEY_ReadState(KEY5) == KEY_PRESS )
+ 229   2                      {
+ 230   3                              lcd_info.sync_flag = 1 - lcd_info.sync_flag;
+ 231   3                              sync_dis(lcd_info.sync_flag);
+ 232   3                              send_to_slave_16();
+ 233   3                      }
+ 234   2              }
+ 235   1              if( KEY_ReadState(KEY6) == KEY_NOPRESS )//释放按键2、3
+ 236   1              {
+ 237   2                      key_val.key2_scan_allow = 1;
+ 238   2                      key_val.key3_scan_allow = 1;
+C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 16:55:12 PAGE 5   
 
- 239   2                      if( KEY_ReadState(KEY6) == KEY_NOPRESS )//释放按键2、3
- 240   2                      {
- 241   3                              key_val.key2_scan_allow = 1;
- 242   3                              key_val.key3_scan_allow = 1;
- 243   3                              key_val.key5_scan_allow = 1;
- 244   3                      }
- 245   2                      //key_val.key_sacn_flag = 0;
- 246   2              }       
- 247   1      }
- 248          
- 249          
- 250          void channel_choose( void )
- 251          {
- 252   1          if(lcd_info.channel_num == 7)
- 253   1          {
- 254   2              lcd_info.channel_num = 1;
- 255   2          }
- 256   1          else
- 257   1          {
- 258   2              lcd_info.channel_num += 1;
- 259   2          }
- 260   1          channel_dis(lcd_info.channel_num);
- 261   1      }
- 262          
- 263          void up_key( void )
- 264          {
- 265   1          if( lcd_info.power_level < 100 )
- 266   1          {
- 267   2              lcd_info.power_level += 5;
- 268   2          }
- 269   1      
- 270   1          num_dis(lcd_info.power_level);
- 271   1      }
- 272          
- 273          void down_key( void )
- 274          {
- 275   1      
- 276   1          if( lcd_info.power_level > 0)
- 277   1          {
- 278   2              lcd_info.power_level -= 5;
- 279   2          }
- 280   1      
- 281   1          num_dis(lcd_info.power_level);
- 282   1      }
- 283          
- 284          void fan_up( void )
- 285          {
- 286   1          if( lcd_info.fan_level < 6 )
- 287   1          {
- 288   2              lcd_info.fan_level++;
- 289   2          }
- 290   1      
- 291   1          wind_dis(lcd_info.fan_level);
- 292   1      }
- 293          
- 294          void fan_down( void )
- 295          {
- 296   1          if( lcd_info.fan_level > 0 )
- 297   1          {
- 298   2              lcd_info.fan_level--;
- 299   2          }
+ 239   2                      key_val.key5_scan_allow = 1;
+ 240   2              }
+ 241   1      }
+ 242          
+ 243          void channel_choose( void )
+ 244          {
+ 245   1          if(lcd_info.channel_num == 7)
+ 246   1          {
+ 247   2              lcd_info.channel_num = 1;
+ 248   2          }
+ 249   1          else
+ 250   1          {
+ 251   2              lcd_info.channel_num += 1;
+ 252   2          }
+ 253   1          channel_dis(lcd_info.channel_num);
+ 254   1      }
+ 255          
+ 256          void up_key( void )
+ 257          {
+ 258   1          if( lcd_info.power_level < 100 )
+ 259   1          {
+ 260   2              lcd_info.power_level += 5;
+ 261   2          }
+ 262   1      
+ 263   1          num_dis(lcd_info.power_level);
+ 264   1      }
+ 265          
+ 266          void down_key( void )
+ 267          {
+ 268   1      
+ 269   1          if( lcd_info.power_level > 5)
+ 270   1          {
+ 271   2              lcd_info.power_level -= 5;
+ 272   2          }
+ 273   1      
+ 274   1          num_dis(lcd_info.power_level);
+ 275   1      }
+ 276          
+ 277          void fan_up( void )
+ 278          {
+ 279   1          if( lcd_info.fan_level < 6 )
+ 280   1          {
+ 281   2              lcd_info.fan_level++;
+ 282   2          }
+ 283   1      
+ 284   1          wind_dis(lcd_info.fan_level);
+ 285   1      }
+ 286          
+ 287          void fan_down( void )
+ 288          {
+ 289   1          if( lcd_info.fan_level > 0 )
+ 290   1          {
+ 291   2              lcd_info.fan_level--;
+ 292   2          }
+ 293   1      
+ 294   1          wind_dis(lcd_info.fan_level);
+ 295   1      }
+ 296          
+ 297          
+ 298          void mode_choose( void )
+ 299          {
  300   1      
-C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 01:35:28 PAGE 6   
+C51 COMPILER V9.60.7.0   TOUCH                                                             05/09/2025 16:55:12 PAGE 6   
 
- 301   1          wind_dis(lcd_info.fan_level);
- 302   1      }
- 303          
- 304          
- 305          void mode_choose( void )
- 306          {
- 307   1      
- 308   1          if(lcd_info.mode_num < 6)
- 309   1          {
- 310   2              lcd_info.mode_num++;
- 311   2                      if( lcd_info.mode_num == 6 )
- 312   2                      {
- 313   3                              lcd_info.mode_num = 1;
- 314   3                      }
- 315   2          }
+ 301   1          if(lcd_info.mode_num < 6)
+ 302   1          {
+ 303   2              lcd_info.mode_num++;
+ 304   2                      if( lcd_info.mode_num == 6 )
+ 305   2                      {
+ 306   3                              lcd_info.mode_num = 1;
+ 307   3                      }
+ 308   2          }
+ 309   1          
+ 310   1          screen_clear();                //一次清屏
+ 311   1      
+ 312   1          mode_dis(DIS_ON);       
+ 313   1          num_dis(lcd_info.mode_num);           //显示模式序号和标志
+ 314   1               
+ 315   1          delay_ms(500);
  316   1          
- 317   1          screen_clear();                //一次清屏
- 318   1      
- 319   1          mode_dis(DIS_ON);       
- 320   1          num_dis(lcd_info.mode_num);           //显示模式序号和标志
- 321   1               
- 322   1          delay_ms(500);
- 323   1          
- 324   1          screen_clear();                 //二次清屏
- 325   1          
- 326   1          mode_dis(DIS_OFF);
- 327   1      
- 328   1          sync_dis(lcd_info.sync_flag);
- 329   1          num_dis(lcd_info.power_level);
- 330   1          channel_dis(3);
- 331   1          percentage_dis(DIS_ON);
- 332   1          wind_dis(lcd_info.fan_level);         
- 333   1      }
+ 317   1          screen_clear();                 //二次清屏
+ 318   1          
+ 319   1          mode_dis(DIS_OFF);
+ 320   1      
+ 321   1          sync_dis(lcd_info.sync_flag);
+ 322   1          num_dis(lcd_info.power_level);
+ 323   1          channel_dis(lcd_info.channel_num);
+ 324   1          wind_dis(lcd_info.fan_level);       
+ 325   1              percentage_dis(DIS_ON);  
+ 326   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1351    ----
+   CODE SIZE        =   1335    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =     69       3
+   XDATA SIZE       =     68       3
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
