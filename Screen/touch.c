@@ -150,11 +150,11 @@ u8 KEY_ReadState(u8 keynum)	//读取指定的按键的状态 10ms执行一次
 		{
 			return KEY_PRESS;
 		}
-		else if( Count[keynum]<80 )		//按下不到3000ms 返回单击结束
+		else if( Count[keynum]<40 )		//按下不到3000ms 返回单击结束
 		{
 			return KEY_PRESSOVER;
 		}		
-		else if( Count[keynum]==80 )		//按下正好3000ms 返回长按状态
+		else if( Count[keynum]==40 )		//按下正好3000ms 返回长按状态
 		{
 			return KEY_LONGPRESS;
 		}	
@@ -221,6 +221,7 @@ void key_scan( void )
 				channel_choose();
 				send_to_slave_16();
 			}
+			modbus.scan_flag_04_allow = 1;
 		}
 		if(( KEY_ReadState(KEY2) == KEY_PRESS ) && ( key_val.key2_scan_allow == 1 ))	//调节功率↑
 		{
@@ -239,6 +240,7 @@ void key_scan( void )
 			modbus.scan_flag_04_allow = 0;
 			mode_choose();
 			send_to_slave_06();
+			delay_ms(100);
 		}
 
 		if( KEY_ReadState(KEY6) == KEY_LONGOVER )										//调节风力

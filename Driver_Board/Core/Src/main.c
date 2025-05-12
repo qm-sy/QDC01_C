@@ -31,14 +31,48 @@ void main( void )
     EA = 1;     //中断总开关
 
     eeprom_statu_judge();       //EEPROM初始化
-
+    PWMB_BKR = 0x00; 
+    EX0 = 0;
+    FAN_TMEP = 0;
+    while ( ac_dc.connect_flag == 0 )
+    {
+        Modbus_Event();
+    }
+    
     printf("========== code start ========== \r\n");
 
     while (1)
     {
-        Modbus_Event();
-        temp_scan();
-        sync_ctrl();
- 
+        if( ac_dc.all_ctrl_flag == 1 )
+        {
+            if( ac_dc.connect_flag == 1)
+            {  
+                sync_ctrl();
+            }
+            if( ac_dc.connect_flag == 0)
+            {
+                PWMB_BKR = 0x00; 
+                EX0 = 0;
+            }
+            Modbus_Event();
+            temp_scan();
+        }
+
+        if( ac_dc.all_ctrl_flag == 0)
+        {
+            ac_dc.buzzer_call_flag2 = 1;
+            ac_dc.buzzer_call_flag1 = 0;
+        }else
+        {
+            ac_dc.buzzer_call_flag2 = 0;
+            if( ac_dc.alarm_flag == 1 )
+            {
+                ac_dc.buzzer_call_flag1 = 1;
+            }else
+            {
+                ac_dc.buzzer_call_flag1 = 0;
+                Buzzer = 1;
+            }
+        }
     }  
 }

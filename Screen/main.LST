@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.7.0   MAIN                                                              05/09/2025 22:57:56 PAGE 1   
+C51 COMPILER V9.60.7.0   MAIN                                                              05/10/2025 16:09:55 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
 OBJECT MODULE PLACED IN .\Output\main.obj
-COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE main.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP\Inc;.\Cor
-                    -e\Inc;.\Emembed\Inc) DEBUG OBJECT(.\Output\main.obj)
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE main.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP\Inc;.\Core\I
+                    -nc;.\Emembed\Inc) DEBUG OBJECT(.\Output\main.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   52   1      
   53   1          while(1)
   54   1          {
-C51 COMPILER V9.60.7.0   MAIN                                                              05/09/2025 22:57:56 PAGE 2   
+C51 COMPILER V9.60.7.0   MAIN                                                              05/10/2025 16:09:55 PAGE 2   
 
   55   2                      Modbus_Event();
   56   2                      key_scan();

@@ -27,6 +27,14 @@ typedef struct
     uint8_t ac_out1_flag;
     uint8_t ac_out2_flag;
     uint8_t ac_out3_flag;
+
+    uint8_t connect_flag;
+    uint8_t alarm_flag;
+    uint8_t all_ctrl_flag;
+    uint8_t buzzer_call_flag1;
+    uint8_t buzzer_call_flag2;
+    uint8_t fan_delay_flag;
+    uint8_t mode_set_flag;
 }AC_DC;
 
 extern AC_DC ac_dc;
@@ -39,5 +47,8 @@ void temp_scan( void );
 void fan_ctrl( uint8_t level );
 void mode_ctrl( uint8_t mode_num );
 void channel_close( void );
+void buzzer_call1( void );
+void buzzer_call2( void );
+void extern_24_listen( void );
 
 #endif

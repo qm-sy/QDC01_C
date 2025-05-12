@@ -99,15 +99,20 @@ void Modbus_Fun4()
 {
     uint8_t start_addr_04 = 3;              //Slave reply  DATA1_H address
     uint16_t i;
-    for( i = 0; i < 1; i++)
+    for( i = 0; i < 2; i++)
     {
         switch (i)
         {
-         case 0:
-            lcd_info.signal_in = rs485.RX4_buf[start_addr_04 + 1];
+        case 0:
+            alarm_dis( rs485.RX4_buf[start_addr_04 + 1] );
 
             break;
- 
+
+        case 1:
+            lcd_info.signal_in = rs485.RX4_buf[start_addr_04 + 1];
+            fan_rotate();
+            break;
+
          default:
              break;
         }
@@ -120,6 +125,10 @@ void Modbus_Fun6( void )
 {
     if(rs485.RX4_buf[3] == 0x05)
     {
+        get_slave_params_03();
+        delay_ms(20);
+        get_slave_params_03();
+        delay_ms(20);
         get_slave_params_03();
     }
     if(rs485.RX4_buf[3] == 0x03)
@@ -251,7 +260,7 @@ void get_slave_params_03( void )
 
 void get_slave_statu_04( void )
 {
-    uint8_t send_buf[8] = {0xDC,0x04,0x00,0x00,0x00,0x01,0x47,0x23};
+    uint8_t send_buf[8] = {0xDC,0x04,0x00,0x00,0x00,0x02,0x46,0x63};
 
     memcpy(rs485.TX4_buf,send_buf,8);
     rs485.TX4_send_bytelength = 8;
@@ -284,7 +293,8 @@ void send_to_slave_06( void )
     DR_485 = 1;                                 //485可以发送
     delay_ms(2);
     S4CON |= S4TI;                              //开始发送
-    delay_ms(1);
+
+    delay_ms(10);
 }
 
 void send_to_slave_16( void )

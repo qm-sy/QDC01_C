@@ -13,6 +13,13 @@ void Power_Statu_Init( void )
     ac_dc.zero_flag  = 0;
     temp.temp_scan_flag = 0;
     AC_Out1 = AC_Out2 = AC_Out3 = 1;
+    ac_dc.connect_flag = 0;
+    ac_dc.alarm_flag = 0;
+    ac_dc.all_ctrl_flag = 1;
+    ac_dc.buzzer_call_flag1 = 0;
+    ac_dc.buzzer_call_flag2 = 0;
+    ac_dc.fan_delay_flag = 0;
+    ac_dc.mode_set_flag = 0;
 }
 
 /**
@@ -105,19 +112,21 @@ void sync_ctrl( void )
 {
     if( ac_dc.sync_flag == 1 )
     {
+        extern_24_listen();
         if( ac_dc.signal_in_flag == 1 )
         {
-            PWMB_BKR = 0x80;    //PWM控制
             EX0 = 1;            //外部中断控制
+            PWMB_BKR = 0x80;    //PWM控制
+            ac_dc.fan_delay_flag = 0;
         }else
-        {
-            PWMB_BKR = 0x00; 
+        {   
             EX0 = 0;
         }
     }else
     {
-        PWMB_BKR = 0x80; 
-        EX0 = 1;
+        EX0 = 1;            //外部中断控制
+        PWMB_BKR = 0x80;    //PWM控制
+        ac_dc.fan_delay_flag = 0;
     }
 }
 
@@ -135,14 +144,26 @@ void temp_scan( void )
     {
         temp.temp_value1 =  get_temp(NTC);
 
-        if( temp.temp_value1 >= ac_dc.alarm_temp_val )
+        if( temp.temp_value1 >= 45 )
         {
             FAN_TMEP = 1;
-        }else
+        }
+        if( temp.temp_value1 <= 35 )
         {
             FAN_TMEP = 0;
         }
-        
+        if( temp.temp_value1 >= ac_dc.alarm_temp_val )
+        {
+            ac_dc.alarm_flag = 1;
+        }else
+        {
+            ac_dc.alarm_flag = 0;
+        }
+        if( temp.temp_value1 >= 120 )
+        {
+            EX0 = 0;
+            ac_dc.all_ctrl_flag = 0;
+        }
         temp.temp_scan_flag = 0;
     }
 }
@@ -189,3 +210,19 @@ void channel_close( void )
         break;
     }
 }
+
+void extern_24_listen( void )
+{
+    static uint8_t now_val = 1;
+    if(now_val != ac_dc.signal_in_flag)
+    {
+        now_val = ac_dc.signal_in_flag;
+        if( now_val == 0 )
+        {
+            ac_dc.fan_delay_flag = 1;
+        }else
+        {
+            ac_dc.fan_delay_flag = 0;
+        }
+    }
+}              

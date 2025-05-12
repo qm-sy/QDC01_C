@@ -5,6 +5,7 @@
 #include "communication.h"
 #include "delay.h"
 #include "tm1722.h"
+#include "common.h"
 
 #define MY_ADDR     0xDC
 

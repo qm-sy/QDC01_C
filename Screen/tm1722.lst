@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 1   
+C51 COMPILER V9.60.7.0   TM1722                                                            05/10/2025 16:09:55 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE TM1722
 OBJECT MODULE PLACED IN .\Output\tm1722.obj
-COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE BSP\Src\tm1722.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP
-                    -\Inc;.\Core\Inc;.\Emembed\Inc) DEBUG PRINT(.\tm1722.lst) OBJECT(.\Output\tm1722.obj)
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE BSP\Src\tm1722.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.\BSP\In
+                    -c;.\Core\Inc;.\Emembed\Inc) DEBUG PRINT(.\tm1722.lst) OBJECT(.\Output\tm1722.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   52   2              case LED_OPEN:
   53   2              BL = 0;
   54   2              LED1 = LED2 = LED3 = LED4 = LED5 = LED6 = LED_ON;
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 2   
+C51 COMPILER V9.60.7.0   TM1722                                                            05/10/2025 16:09:55 PAGE 2   
 
   55   2      
   56   2              break;
@@ -126,7 +126,7 @@ line level    source
  114   1          uint8_t hundreds = num / 100;  // 获取百位数
  115   1          uint8_t tens = (num / 10) % 10;  // 获取十位数
  116   1          uint8_t ones = num % 10;  // 获取个位数
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 3   
+C51 COMPILER V9.60.7.0   TM1722                                                            05/10/2025 16:09:55 PAGE 3   
 
  117   1          
  118   1          value_0B &= 0x00;
@@ -190,7 +190,7 @@ line level    source
  176   2                  value_0F |= 0xc0;
  177   2                  break;
  178   2              
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 4   
+C51 COMPILER V9.60.7.0   TM1722                                                            05/10/2025 16:09:55 PAGE 4   
 
  179   2              case 3:
  180   2                  value_0F |= 0xc8;
@@ -254,7 +254,7 @@ line level    source
  238   2                  break;
  239   2              
  240   2              case 6:
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 5   
+C51 COMPILER V9.60.7.0   TM1722                                                            05/10/2025 16:09:55 PAGE 5   
 
  241   2                  value_0E |= 0x03;
  242   2                  value_0B |= 0x30;
@@ -318,7 +318,7 @@ line level    source
  300          void mode_dis(uint8_t on_off)
  301          {
  302   1          value_03 &= 0x7f;
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 6   
+C51 COMPILER V9.60.7.0   TM1722                                                            05/10/2025 16:09:55 PAGE 6   
 
  303   1          if(on_off==DIS_ON)
  304   1          {
@@ -373,72 +373,89 @@ line level    source
  353   1          if( lcd_info.alarm_set_flag == 0 )
  354   1          {   
  355   2              fan_center_dis(DIS_ON);
- 356   2              if(( lcd_info.signal_in == 1) || (lcd_info.sync_flag == 0))
+ 356   2              if( lcd_info.fan_level > 0 )
  357   2              {
- 358   3                  if( lcd_info.fan_level > 0 )
+ 358   3                  if( lcd_info.sync_flag == 1 )
  359   3                  {
- 360   4                      fan_leaf1_dis(lcd_info.fan_rotate_flag);
- 361   4                      fan_leaf2_dis(1 - lcd_info.fan_rotate_flag);
- 362   4                  }
- 363   3                  sun_dis(DIS_ON);
- 364   3              }else
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 7   
+ 360   4                      sync_dis(DIS_ON);
+ 361   4                      if( lcd_info.signal_in == 1 )
+ 362   4                      {
+ 363   5                          fan_leaf1_dis(lcd_info.fan_rotate_flag);
+ 364   5                          fan_leaf2_dis(1 - lcd_info.fan_rotate_flag);
+C51 COMPILER V9.60.7.0   TM1722                                                            05/10/2025 16:09:55 PAGE 7   
 
- 365   2              {
- 366   3                  fan_leaf1_dis(DIS_ON);
- 367   3                  fan_leaf2_dis(DIS_OFF);
- 368   3                  sun_dis(DIS_OFF);
- 369   3              }
- 370   2          }
- 371   1      }
- 372          
- 373          void alarm_temp_flick( void )
- 374          {
- 375   1          static uint8_t now_val = 0;
- 376   1          if( now_val != lcd_info.alarm_temp_flick_flag )
- 377   1          {
- 378   2              if( lcd_info.alarm_set_flag == 1 )
- 379   2              {
- 380   3                  if( lcd_info.alarm_temp_flick_flag == 1 )
- 381   3                  {
- 382   4                      num_dis(lcd_info.alarm_temp_val);
- 383   4                      Celsius_dis(DIS_ON);
- 384   4                  }else
- 385   3                  {
- 386   4                      screen_clear();
- 387   4                      fan_leaf1_dis(DIS_OFF);
- 388   4                      fan_leaf2_dis(DIS_OFF);
- 389   4                      fan_center_dis(DIS_OFF);
- 390   4                      Celsius_dis(DIS_ON);
- 391   4                      sun_dis(DIS_OFF);
- 392   4                      wind_dis(0);
- 393   4                      channel_dis(0);
- 394   4                  }
- 395   3              } 
- 396   2              now_val = lcd_info.alarm_temp_flick_flag;
- 397   2          }
- 398   1          
- 399   1      }
- 400          void screen_all_dis( void )
- 401          {
- 402   1          num_dis(lcd_info.power_level);
- 403   1          wind_dis(lcd_info.fan_level);
- 404   1          channel_dis(lcd_info.channel_num);
- 405   1          sync_dis(lcd_info.sync_flag);
- 406   1          if( lcd_info.sync_flag == 1 )
- 407   1          {
- 408   2              sun_dis(DIS_OFF);
- 409   2          }else
- 410   1          {
- 411   2              sun_dis(DIS_ON);
+ 365   5                          sun_dis(DIS_ON);
+ 366   5                      }else
+ 367   4                      {
+ 368   5                          fan_leaf1_dis(DIS_ON);
+ 369   5                          fan_leaf2_dis(DIS_OFF);
+ 370   5                          sun_dis(DIS_OFF);
+ 371   5                      }
+ 372   4                  }else
+ 373   3                  {
+ 374   4                      sync_dis(DIS_OFF);
+ 375   4                      fan_leaf1_dis(lcd_info.fan_rotate_flag);
+ 376   4                      fan_leaf2_dis(1 - lcd_info.fan_rotate_flag);
+ 377   4                      sun_dis(DIS_ON);
+ 378   4                  }
+ 379   3              }else
+ 380   2              {
+ 381   3                  fan_leaf1_dis(DIS_ON);
+ 382   3                  fan_leaf2_dis(DIS_OFF);
+ 383   3                  sun_dis(DIS_OFF);
+ 384   3              }
+ 385   2          }
+ 386   1      }
+ 387          
+ 388          void alarm_temp_flick( void )
+ 389          {
+ 390   1          static uint8_t now_val = 0;
+ 391   1          if( now_val != lcd_info.alarm_temp_flick_flag )
+ 392   1          {
+ 393   2              if( lcd_info.alarm_set_flag == 1 )
+ 394   2              {
+ 395   3                  if( lcd_info.alarm_temp_flick_flag == 1 )
+ 396   3                  {
+ 397   4                      num_dis(lcd_info.alarm_temp_val);
+ 398   4                      Celsius_dis(DIS_ON);
+ 399   4                  }else
+ 400   3                  {
+ 401   4                      screen_clear();
+ 402   4                      fan_leaf1_dis(DIS_OFF);
+ 403   4                      fan_leaf2_dis(DIS_OFF);
+ 404   4                      fan_center_dis(DIS_OFF);
+ 405   4                      Celsius_dis(DIS_ON);
+ 406   4                      sun_dis(DIS_OFF);
+ 407   4                      wind_dis(0);
+ 408   4                      channel_dis(0);
+ 409   4                  }
+ 410   3              } 
+ 411   2              now_val = lcd_info.alarm_temp_flick_flag;
  412   2          }
- 413   1          percentage_dis(DIS_ON);
- 414   1          Celsius_dis(DIS_OFF);
- 415   1      }
+ 413   1          
+ 414   1      }
+ 415          void screen_all_dis( void )
+ 416          {
+ 417   1          num_dis(lcd_info.power_level);
+ 418   1          wind_dis(lcd_info.fan_level);
+ 419   1          channel_dis(lcd_info.channel_num);
+ 420   1          sync_dis(lcd_info.sync_flag);
+ 421   1          if( lcd_info.sync_flag == 1 )
+ 422   1          {
+ 423   2              sun_dis(DIS_OFF);
+ 424   2          }else
+ 425   1          {
+ 426   2              sun_dis(DIS_ON);
+C51 COMPILER V9.60.7.0   TM1722                                                            05/10/2025 16:09:55 PAGE 8   
+
+ 427   2          }
+ 428   1          percentage_dis(DIS_ON);
+ 429   1          Celsius_dis(DIS_OFF);
+ 430   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1279    ----
+   CODE SIZE        =   1292    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =     37       4
    PDATA SIZE       =   ----    ----
@@ -446,8 +463,6 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
    EDATA SIZE       =   ----    ----
-C51 COMPILER V9.60.7.0   TM1722                                                            05/09/2025 22:57:56 PAGE 8   
-
    HDATA SIZE       =   ----    ----
    XDATA CONST SIZE =   ----    ----
    FAR CONST SIZE   =   ----    ----

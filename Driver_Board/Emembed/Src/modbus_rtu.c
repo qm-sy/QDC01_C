@@ -161,10 +161,15 @@ void Modbus_Fun4( void )
         {
             case 0:
                 modbus.byte_info_H = 0x00;
-                modbus.byte_info_L = ac_dc.signal_in_flag;
+                modbus.byte_info_L = ac_dc.alarm_flag;
 
                 break;
 
+            case 1:
+                modbus.byte_info_H = 0x00;
+                modbus.byte_info_L = ac_dc.signal_in_flag;
+
+                break;
             default:
                 break;
         }
@@ -206,16 +211,15 @@ void Modbus_Fun6( void )
             
         /*  40004  同步状态设置                   */
         case 0x03:                                         
-            PWMB_BKR = 0x80;    //PWM控制
-            EX0 = 1;            //外部中断控制
-
+            sync_ctrl();
+            ac_dc.connect_flag = 1;
             break;
 
         /*  40005  工作模式设置                   */
         case 0x04:                                         
             PWMB_BKR = 0x00; 
             EX0 = 0;
-
+            ac_dc.connect_flag = 0;
             break;
 
         /*  40006  报警温度设置                   */
@@ -229,7 +233,7 @@ void Modbus_Fun6( void )
             break;   
     }
     slave_to_master(0x06,8);
-    delay_ms(20);
+    delay_ms(5);
     Buzzer = 1;
 }
 
@@ -243,6 +247,7 @@ void Modbus_Fun6( void )
 void Modbus_Fun16( void )
 {
     uint16_t i;
+
     Buzzer = 0;
     modbus.rcv_value_addr = 7;                  //DATA1 H位置
     modbus.byte_cnt   = rs485.RX4_buf[6];
@@ -265,6 +270,10 @@ void Modbus_Fun16( void )
             /*  40002   同步状态设置                          */
             case 0x01:
                 ac_dc.sync_flag = modbus.byte_info_L;
+                if( ac_dc.sync_flag == 1)
+                {
+                    PWMB_BKR = 0x00;
+                }
                 sync_ctrl(); 
 
                 break;

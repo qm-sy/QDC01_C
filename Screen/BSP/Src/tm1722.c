@@ -353,14 +353,29 @@ void fan_rotate()
     if( lcd_info.alarm_set_flag == 0 )
     {   
         fan_center_dis(DIS_ON);
-        if(( lcd_info.signal_in == 1) || (lcd_info.sync_flag == 0))
+        if( lcd_info.fan_level > 0 )
         {
-            if( lcd_info.fan_level > 0 )
+            if( lcd_info.sync_flag == 1 )
             {
+                sync_dis(DIS_ON);
+                if( lcd_info.signal_in == 1 )
+                {
+                    fan_leaf1_dis(lcd_info.fan_rotate_flag);
+                    fan_leaf2_dis(1 - lcd_info.fan_rotate_flag);
+                    sun_dis(DIS_ON);
+                }else
+                {
+                    fan_leaf1_dis(DIS_ON);
+                    fan_leaf2_dis(DIS_OFF);
+                    sun_dis(DIS_OFF);
+                }
+            }else
+            {
+                sync_dis(DIS_OFF);
                 fan_leaf1_dis(lcd_info.fan_rotate_flag);
                 fan_leaf2_dis(1 - lcd_info.fan_rotate_flag);
+                sun_dis(DIS_ON);
             }
-            sun_dis(DIS_ON);
         }else
         {
             fan_leaf1_dis(DIS_ON);

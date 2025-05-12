@@ -31,7 +31,7 @@ void eeprom_statu_judge( void )
         ac_dc.power_level       = 0x32;          // 50         220V输出50%功率
         ac_220v_crl(ac_dc.power_level);
         
-        ac_dc.alarm_temp_val    = 0x2D;          // 报警温度默认80℃
+        ac_dc.alarm_temp_val    = 0x50;          // 报警温度默认80℃
 
         mode_info[0] = ac_dc.channel_num;
         mode_info[1] = ac_dc.sync_flag;
