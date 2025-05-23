@@ -1,0 +1,318 @@
+C51 COMPILER V9.60.7.0   KEY                                                               05/24/2025 00:00:20 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE KEY
+OBJECT MODULE PLACED IN ..\Output\key.obj
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\BSP\Src\key.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Driver;
+                    -..\SYSTEM\Inc;..\BSP\Inc;..\Core\Inc;..\Emembed\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\key.lst) OBJECT(..\Output\key.o
+                    -bj)
+
+line level    source
+
+   1          #include "key.h"
+   2          
+   3          KEY key;
+   4          
+   5          volatile uint8_t key_value = 0;
+   6          
+   7          void key_scan( void )
+   8          {
+   9   1          uint8_t key1_continue_cnt;
+  10   1          uint8_t key3_continue_cnt;
+  11   1          uint8_t key5_continue_cnt;
+  12   1      
+  13   1          if( key.key_read_allow == 1 )
+  14   1          {
+  15   2              key.key_read_allow = 0;
+  16   2              switch (key_value)
+  17   2              {
+  18   3              case PowerKey:
+  19   3                  key1_continue_cnt = 100;
+  20   3                  while((key_value == PowerKey) && (key1_continue_cnt > 0))
+  21   3                  {
+  22   4                      key1_continue_cnt--;
+  23   4                      delay_ms(10);
+  24   4                  }
+  25   3                  if( key1_continue_cnt == 0 )
+  26   3                  {
+  27   4                      power_on_off(POWER_OFF);
+  28   4                  }else
+  29   3                  {
+  30   4                      power_on_off(POWER_ON);
+  31   4                  }
+  32   3                  printf("111 \r\n");
+  33   3                  break;
+  34   3      
+  35   3              case PowerUp:
+  36   3                  power_ctrl(PowerUp);
+  37   3                  printf("222 \r\n");    
+  38   3                  break;
+  39   3                  
+  40   3              case PowerDown:
+  41   3                  power_ctrl(PowerDown);
+  42   3                  printf("333 \r\n");
+  43   3                  break;
+  44   3      
+  45   3              case FanUp:
+  46   3                  fan_ctrl(FanUp);
+  47   3                  printf("444 \r\n");    
+  48   3                  break;
+  49   3                  
+  50   3              case FanDown:
+  51   3                  fan_ctrl(FanDown);
+  52   3                  printf("555 \r\n");    
+  53   3                  break;
+C51 COMPILER V9.60.7.0   KEY                                                               05/24/2025 00:00:20 PAGE 2   
+
+  54   3      
+  55   3              case Channel:
+  56   3                  key3_continue_cnt = 100;
+  57   3                  while((key_value == Channel) && (key3_continue_cnt > 0))
+  58   3                  {
+  59   4                      key3_continue_cnt--;
+  60   4                      delay_ms(10);
+  61   4                  }
+  62   3                  if( key3_continue_cnt == 0 )
+  63   3                  {
+  64   4                      alarm_temp_set();
+  65   4                  }else
+  66   3                  {
+  67   4                      if( lcd_info.alarm_set_flag == 1 )
+  68   4                      {
+  69   5                          lcd_info.alarm_set_flag = 0;
+  70   5                      }else
+  71   4                      {
+  72   5                          channel_ctrl();
+  73   5                      }
+  74   4                  }
+  75   3                  printf("666 \r\n");
+  76   3                  break;
+  77   3                  
+  78   3              case Mode:
+  79   3                  key5_continue_cnt = 100;
+  80   3                  while((key_value == Mode) && (key5_continue_cnt > 0))
+  81   3                  {
+  82   4                      key5_continue_cnt--;
+  83   4                      delay_ms(10);
+  84   4                  }
+  85   3                  if( key5_continue_cnt == 0 )
+  86   3                  {
+  87   4                      sync_ctrl();
+  88   4                  }else
+  89   3                  {
+  90   4                      mode_ctrl();
+  91   4                  }
+  92   3                  printf("777 \r\n");
+  93   3                  break;
+  94   3      
+  95   3              default:
+  96   3                  break;
+  97   3              }
+  98   2          }
+  99   1      }
+ 100          
+ 101          void power_on_off( uint8_t key_ctrl )
+ 102          {
+ 103   1          if( key_ctrl == POWER_ON )
+ 104   1          {
+ 105   2              if( lcd_info.power_on == 0 )
+ 106   2              {
+ 107   3                  led_status(LED_OPEN);
+ 108   3                  lcd_info.power_on = 1;
+ 109   3                  slave_work_ctrl();
+ 110   3              }
+ 111   2          }else
+ 112   1          {
+ 113   2                  led_status(LED_SLEEP);
+ 114   2                  lcd_info.power_on = 0;
+ 115   2                  slave_sleep_ctrl();                   //开始发送
+C51 COMPILER V9.60.7.0   KEY                                                               05/24/2025 00:00:20 PAGE 3   
+
+ 116   2                  delay_ms(1000);                             //避免误触再次开启
+ 117   2          }
+ 118   1      
+ 119   1      }
+ 120          
+ 121          void power_ctrl( uint8_t key_ctrl )
+ 122          {
+ 123   1          if( key_ctrl == PowerUp )
+ 124   1          {
+ 125   2              if( lcd_info.alarm_set_flag == 0 )
+ 126   2                  {
+ 127   3                      if( lcd_info.power_level < 100 )
+ 128   3                      {
+ 129   4                          lcd_info.power_level += 5;
+ 130   4                      }
+ 131   3                      num_dis(lcd_info.power_level);
+ 132   3                  }else
+ 133   2                  {
+ 134   3                      if( lcd_info.alarm_temp_val < 120 )
+ 135   3                      {
+ 136   4                          lcd_info.alarm_temp_val += 1;
+ 137   4                      }
+ 138   3                      num_dis(lcd_info.alarm_temp_val);
+ 139   3                  }
+ 140   2          }else
+ 141   1          {
+ 142   2              if( lcd_info.alarm_set_flag == 0 )
+ 143   2              {
+ 144   3                  if( lcd_info.power_level > 5 )
+ 145   3                  {
+ 146   4                      lcd_info.power_level -= 5;
+ 147   4                  }
+ 148   3      
+ 149   3                  num_dis(lcd_info.power_level);
+ 150   3              }else
+ 151   2              {
+ 152   3                  if( lcd_info.alarm_temp_val > 40 )
+ 153   3                  {
+ 154   4                      lcd_info.alarm_temp_val -= 1;
+ 155   4                  }
+ 156   3                  num_dis(lcd_info.alarm_temp_val);
+ 157   3              }
+ 158   2              
+ 159   2          }
+ 160   1          send_to_slave_16();
+ 161   1      }
+ 162          
+ 163          void fan_ctrl( uint8_t key_ctrl )
+ 164          {
+ 165   1          if( key_ctrl == FanUp )
+ 166   1          {
+ 167   2              if( lcd_info.fan_level < 6 )
+ 168   2              {
+ 169   3                  lcd_info.fan_level++;
+ 170   3              }
+ 171   2      
+ 172   2              wind_dis(lcd_info.fan_level);
+ 173   2              
+ 174   2      
+ 175   2          }else
+ 176   1          {
+ 177   2              if( lcd_info.fan_level > 0 )
+C51 COMPILER V9.60.7.0   KEY                                                               05/24/2025 00:00:20 PAGE 4   
+
+ 178   2              {
+ 179   3                  lcd_info.fan_level--;
+ 180   3              }
+ 181   2      
+ 182   2              wind_dis(lcd_info.fan_level);
+ 183   2          }
+ 184   1          send_to_slave_16();
+ 185   1      }
+ 186          
+ 187          void channel_ctrl( void )
+ 188          {
+ 189   1          if(lcd_info.channel_num == 7)
+ 190   1          {
+ 191   2              lcd_info.channel_num = 1;
+ 192   2          }
+ 193   1          else
+ 194   1          {
+ 195   2              lcd_info.channel_num += 1;
+ 196   2          }
+ 197   1          channel_dis(lcd_info.channel_num);
+ 198   1          send_to_slave_16();
+ 199   1      }
+ 200          
+ 201          void mode_ctrl( void )
+ 202          {
+ 203   1          if(lcd_info.mode_num < 6)
+ 204   1          {
+ 205   2              lcd_info.mode_num++;
+ 206   2                      if( lcd_info.mode_num == 6 )
+ 207   2                      {
+ 208   3                              lcd_info.mode_num = 1;
+ 209   3                      }
+ 210   2          }
+ 211   1          
+ 212   1          screen_clear();                //一次清屏
+ 213   1      
+ 214   1          mode_dis(DIS_ON);       
+ 215   1          num_dis(lcd_info.mode_num);           //显示模式序号和标志
+ 216   1               
+ 217   1          delay_ms(500);
+ 218   1          
+ 219   1          screen_clear();                 //二次清屏
+ 220   1          
+ 221   1          mode_dis(DIS_OFF);
+ 222   1      
+ 223   1          sync_dis(lcd_info.sync_flag);
+ 224   1          num_dis(lcd_info.power_level);
+ 225   1          channel_dis(lcd_info.channel_num);
+ 226   1          wind_dis(lcd_info.fan_level);       
+ 227   1              percentage_dis(DIS_ON);  
+ 228   1      
+ 229   1          send_to_slave_06();
+ 230   1      }
+ 231          
+ 232          void alarm_temp_set( void )
+ 233          {
+ 234   1          send_to_slave_16();
+ 235   1          delay_ms(500);
+ 236   1          while(key_value != Channel)
+ 237   1          {
+ 238   2              if( lcd_info.alarm_temp_flick_flag == 1 )
+ 239   2              {
+C51 COMPILER V9.60.7.0   KEY                                                               05/24/2025 00:00:20 PAGE 5   
+
+ 240   3                  percentage_dis(0);
+ 241   3                  num_dis(lcd_info.alarm_temp_val);
+ 242   3                  Celsius_dis(DIS_ON);
+ 243   3              }else
+ 244   2              {
+ 245   3                  screen_write_val(addr_tab[ADDR_0F],0X00);
+ 246   3                  screen_write_val(addr_tab[ADDR_0E],0X00);
+ 247   3                  screen_write_val(addr_tab[ADDR_0B],0x00);
+ 248   3                  screen_write_val(addr_tab[ADDR_0A],0X00);
+ 249   3                  screen_write_val(addr_tab[ADDR_07],0X00);
+ 250   3                  screen_write_val(addr_tab[ADDR_06],0X00);
+ 251   3                  screen_write_val(addr_tab[ADDR_03],0x40);    
+ 252   3                  delay_ms(5);
+ 253   3              }
+ 254   2      
+ 255   2              if( key_value == PowerUp )
+ 256   2              {
+ 257   3                  if( lcd_info.alarm_temp_val < 120 )
+ 258   3                  {
+ 259   4                      lcd_info.alarm_temp_val += 1;
+ 260   4                  }
+ 261   3                  send_to_slave_16();
+ 262   3                  delay_ms(300);
+ 263   3              }
+ 264   2              if( key_value == PowerDown )
+ 265   2              {
+ 266   3                  if( lcd_info.alarm_temp_val > 40 )
+ 267   3                  {
+ 268   4                      lcd_info.alarm_temp_val -= 1;
+ 269   4                  }
+ 270   3                  send_to_slave_16();
+ 271   3                  delay_ms(300);
+ 272   3              }
+ 273   2          }
+ 274   1          send_to_slave_16();
+ 275   1          screen_all_dis();
+ 276   1          
+ 277   1          delay_ms(1000);
+ 278   1      }
+ 279          void sync_ctrl( void )
+ 280          {
+ 281   1          lcd_info.sync_flag = 1 - lcd_info.sync_flag;
+ 282   1          sync_dis(lcd_info.sync_flag);
+ 283   1          send_to_slave_16();
+ 284   1          delay_ms(1000);
+ 285   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    798    ----
+   CONSTANT SIZE    =     49    ----
+   XDATA SIZE       =      2       3
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

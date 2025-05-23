@@ -1,2 +1,2 @@
-# QDC01_C
+# QDC01_C-
 For Duan code screen（485）
